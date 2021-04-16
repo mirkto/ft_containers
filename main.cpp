@@ -165,8 +165,6 @@ PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
 		PRINT(CLR_YLW "\n --- sort ---" CLR_END);
 		test.sort();
 			TEST_LIST
-
-
 	}
 PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
 	{
@@ -230,7 +228,13 @@ PRINT(CLR_PRP "\n\n --- --- testing iterator --- ---\n" CLR_END);
 			TEST_ITER("*(++test.begin()) = \"Shaka\"",test_my)
 		*test_my.rbegin() = "BOOM";
 			PRT("*test.rbegin() = \"BOOM\"") printValues(test_my.rbegin(), test_my.rend());
-		
+	PRINT(CLR_YLW " --- const_iterator ---" CLR_END);
+		std::list<std::string>::const_iterator		bit(test.begin());
+		std::list<std::string>::const_iterator		eit = test.end();
+			PRT(" origin iterator ") printValues(bit, eit);
+		// ft::List<std::string>::const_iterator		bit_my(test_my.begin());
+		// ft::List<std::string>::const_iterator		eit_my = test_my.end();
+		// 	PRT(" my iterator ") printValues(bit_my, eit_my);
 	}
 }
 // ---------------------------------------------------------------------

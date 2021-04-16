@@ -74,9 +74,21 @@ public:
 	}
 
 	// --- range
-	// template <class InputIterator>
-	// List (InputIterator first, InputIterator last,
-	// 		const allocator_type& alloc = allocator_type());
+	template <class InputIterator, 
+	class std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type*>
+	List (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
+	{
+		if (!first || !last)
+			std::cout << " --- empty input iterator ---" << std::endl;
+		_alloc = alloc;
+		_tail = new s_list<value_type>;
+		_tail->next_list = _tail;
+		_tail->prev_list = _tail;
+		_tail->len = 0;
+		bzero(&_tail->value, sizeof(T));
+		for (; first != last; first++)
+			push_back(*first);
+	}
 
 	// --- destructor
 	virtual ~List()
