@@ -194,16 +194,45 @@ public:
 	}
 
 	template <class InputIterator>
-	void assign (InputIterator first, InputIterator last);
-	void assign (size_type n, const value_type& val);
+	void assign (InputIterator first, InputIterator last, typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = 0)
+	{
+		clear();
+		for(; first != last; first++)
+			push_back(*first);
+	}
+
+	void assign (size_type n, const value_type& val)
+	{
+		clear();
+		for(; _tail->len != n; )
+			push_back(val);
+	}
 
 	iterator insert (iterator position, const value_type& val);
 	void insert (iterator position, size_type n, const value_type& val);
 	template <class InputIterator>
 	void insert (iterator position, InputIterator first, InputIterator last);
 
-	iterator erase (iterator position);
-	iterator erase (iterator first, iterator last);
+	iterator erase (iterator position)
+	{
+		if (position.getList() == _tail)
+			return position;
+		iterator tmp;
+		tmp = position.getList()->prev_list;
+		position.getList()->prev_list->next_list = position.getList()->next_list;
+		position.getList()->next_list->prev_list = position.getList()->prev_list;
+		delete position.getList();
+		--_tail->len;
+		return tmp;
+	}
+
+	iterator erase (iterator first, iterator last)
+	{
+		iterator tmp = last.getList()->prev_list;
+		for (; first != last; first++)
+			erase(first);
+		return tmp;
+	}
 
 	void swap (List & x)
 	{

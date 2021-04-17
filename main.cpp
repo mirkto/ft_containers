@@ -147,8 +147,9 @@ PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
 PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
 	{
 		ft::List<int>	test;
+		ft::List<int>	test_copy;
 
-		PRINT(CLR_YLW "\n --- 'test.remove(21)' ---" CLR_END);
+	PRINT(CLR_YLW "\n --- 'test.remove(21)' ---" CLR_END);
 		test.push_back(21);
 		test.push_back(5);
 		test.push_back(21);
@@ -162,80 +163,92 @@ PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
 		test.remove(21);
 			TEST_LIST
 
-		PRINT(CLR_YLW "\n --- sort ---" CLR_END);
+	PRINT(CLR_YLW "\n --- sort ---" CLR_END);
 		test.sort();
 			TEST_LIST
-	}
-PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
-	{
-	PRINT(CLR_YLW "\n --- std::string test ---" CLR_END);
-		ft::List<std::string>	test;
-		test.push_back("a");
-		test.push_back("A");
-		test.push_back("B");
-		test.push_back("b");
-		test.push_back("c");
-		test.push_back("C");
-		test.push_back("D");
-		test.push_back("d");
-		test.size();
-			TEST_LIST
-	PRINT(CLR_YLW " --- sort ---" CLR_END);
-		test.sort();
-			printValues(test.begin(), test.end());
-	PRINT(CLR_YLW " --- sort(Compare comp) ---" CLR_END);
-		test.sort(compare_nocase);
-			printValues(test.begin(), test.end());
 
-	PRINT(CLR_YLW "\n --- std::string test_copy ---" CLR_END);
-		ft::List<std::string>	test_copy;
-		test_copy.push_back("one");
-		test_copy.push_back("two");
-		test_copy.push_back("Three");
-			TEST(test_copy)
-	PRINT(CLR_YLW " --- sort ---" CLR_END);
-		test_copy.sort();
-			printValues(test_copy.begin(), test_copy.end());
-	PRINT(CLR_YLW " --- sort(Compare comp) ---" CLR_END);
-		test_copy.sort(compare_nocase);
-			printValues(test_copy.begin(), test_copy.end());
+	PRINT(CLR_YLW "\n --- assign ---" CLR_END);
+		test_copy.assign(test.begin(),test.end());
+			PRT("test_copy.assign(test.begin(),test.end())") TEST(test_copy);
+		test_copy.assign(7,100);
+			PRT("test_copy.assign(7,100)") TEST(test_copy);
+
+	PRINT(CLR_YLW "\n --- erase ---" CLR_END);
+		test.erase(++test.begin());
+			TEST_LIST
+		test.erase(test.begin(), --test.end());
+			TEST_LIST
 	}
-PRINT(CLR_PRP "\n\n --- --- testing iterator --- ---\n" CLR_END);
-	{
-	PRINT(CLR_YLW "\n --- origin iterator ---" CLR_END);
-		std::list<std::string>		test;
-		test.push_back("one");
-		test.push_back("two");
-		test.push_back("Three");
-			TEST_ITER("iterator",test)
-			PRT("reverse iterator") printValues(test.rbegin(), test.rend());
-		*test.begin() = "Laka";
-			TEST_ITER("*test.begin() = \"Laka\"",test)
-		*(++test.begin()) = "Shaka";
-			TEST_ITER("*(++test.begin()) = \"Shaka\"",test)
-		*test.rbegin() = "BOOM";
-			PRT("*test.rbegin() = \"BOOM\"") printValues(test.rbegin(), test.rend());
-	PRINT(CLR_YLW " --- my iterator ---" CLR_END);
-		ft::List<std::string>		test_my;
-		test_my.push_back("one");
-		test_my.push_back("two");
-		test_my.push_back("Three");
-			TEST_ITER("iterator",test_my)
-			PRT("reverse iterator") printValues(test_my.rbegin(), test_my.rend());
-		*test_my.begin() = "Laka";
-			TEST_ITER("*test.begin() = \"Laka\"",test_my)
-		*(++test_my.begin()) = "Shaka";
-			TEST_ITER("*(++test.begin()) = \"Shaka\"",test_my)
-		*test_my.rbegin() = "BOOM";
-			PRT("*test.rbegin() = \"BOOM\"") printValues(test_my.rbegin(), test_my.rend());
-	PRINT(CLR_YLW " --- const_iterator ---" CLR_END);
-		std::list<std::string>::const_iterator		bit(test.begin());
-		std::list<std::string>::const_iterator		eit = test.end();
-			PRT(" origin iterator ") printValues(bit, eit);
-		// ft::List<std::string>::const_iterator		bit_my(test_my.begin());
-		// ft::List<std::string>::const_iterator		eit_my = test_my.end();
-		// 	PRT(" my iterator ") printValues(bit_my, eit_my);
-	}
+// PRINT(CLR_PRP "\n\n --- --- next test --- ---\n" CLR_END); //-----------
+	// {
+	// PRINT(CLR_YLW "\n --- std::string test ---" CLR_END);
+	// 	ft::List<std::string>	test;
+	// 	test.push_back("a");
+	// 	test.push_back("A");
+	// 	test.push_back("B");
+	// 	test.push_back("b");
+	// 	test.push_back("c");
+	// 	test.push_back("C");
+	// 	test.push_back("D");
+	// 	test.push_back("d");
+	// 	test.size();
+	// 		TEST_LIST
+	// PRINT(CLR_YLW " --- sort ---" CLR_END);
+	// 	test.sort();
+	// 		printValues(test.begin(), test.end());
+	// PRINT(CLR_YLW " --- sort(Compare comp) ---" CLR_END);
+	// 	test.sort(compare_nocase);
+	// 		printValues(test.begin(), test.end());
+
+	// PRINT(CLR_YLW "\n --- std::string test_copy ---" CLR_END);
+	// 	ft::List<std::string>	test_copy;
+	// 	test_copy.push_back("one");
+	// 	test_copy.push_back("two");
+	// 	test_copy.push_back("Three");
+	// 		TEST(test_copy)
+	// PRINT(CLR_YLW " --- sort ---" CLR_END);
+	// 	test_copy.sort();
+	// 		printValues(test_copy.begin(), test_copy.end());
+	// PRINT(CLR_YLW " --- sort(Compare comp) ---" CLR_END);
+	// 	test_copy.sort(compare_nocase);
+	// 		printValues(test_copy.begin(), test_copy.end());
+	// }
+// PRINT(CLR_PRP "\n\n --- --- testing iterator --- ---\n" CLR_END);
+	// {
+	// PRINT(CLR_YLW "\n --- origin iterator ---" CLR_END);
+	// 	std::list<std::string>		test;
+	// 	test.push_back("one");
+	// 	test.push_back("two");
+	// 	test.push_back("Three");
+	// 		TEST_ITER("iterator",test)
+	// 		PRT("reverse iterator") printValues(test.rbegin(), test.rend());
+	// 	*test.begin() = "Laka";
+	// 		TEST_ITER("*test.begin() = \"Laka\"",test)
+	// 	*(++test.begin()) = "Shaka";
+	// 		TEST_ITER("*(++test.begin()) = \"Shaka\"",test)
+	// 	*test.rbegin() = "BOOM";
+	// 		PRT("*test.rbegin() = \"BOOM\"") printValues(test.rbegin(), test.rend());
+	// PRINT(CLR_YLW " --- my iterator ---" CLR_END);
+	// 	ft::List<std::string>		test_my;
+	// 	test_my.push_back("one");
+	// 	test_my.push_back("two");
+	// 	test_my.push_back("Three");
+	// 		TEST_ITER("iterator",test_my)
+	// 		PRT("reverse iterator") printValues(test_my.rbegin(), test_my.rend());
+	// 	*test_my.begin() = "Laka";
+	// 		TEST_ITER("*test.begin() = \"Laka\"",test_my)
+	// 	*(++test_my.begin()) = "Shaka";
+	// 		TEST_ITER("*(++test.begin()) = \"Shaka\"",test_my)
+	// 	*test_my.rbegin() = "BOOM";
+	// 		PRT("*test.rbegin() = \"BOOM\"") printValues(test_my.rbegin(), test_my.rend());
+	// PRINT(CLR_YLW " --- const_iterator ---" CLR_END);
+	// 	std::list<std::string>::const_iterator		bit(test.begin());
+	// 	std::list<std::string>::const_iterator		eit = test.end();
+	// 		PRT(" origin iterator ") printValues(bit, eit);
+	// 	// ft::List<std::string>::const_iterator		bit_my(test_my.begin());
+	// 	// ft::List<std::string>::const_iterator		eit_my = test_my.end();
+	// 	// 	PRT(" my iterator ") printValues(bit_my, eit_my);
+	// }
 }
 // ---------------------------------------------------------------------
 void		ft_wait()

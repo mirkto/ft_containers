@@ -69,7 +69,7 @@ public:
 
 	T&				operator*()		{ return _p->value;		}
 	T&				operator->()	{ return &_p->value;	}
-	// ft::s_list<T>*	getList()		{ return _p;			}
+	ft::s_list<T>*	getList()		{ return _p;			}
 
 	ListIterator&	operator++()			{ _p = _p->next_list; return *this;						}
 	ListIterator	operator++(int)			{ ListIterator tmp(*this); operator++(); return tmp;	}
