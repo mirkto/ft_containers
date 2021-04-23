@@ -1,10 +1,7 @@
-#ifndef LISTITERATOR_HPP
-# define LISTITERATOR_HPP
+#ifndef ITERATOR_HPP
+# define ITERATOR_HPP
 
-# include <iostream>
-// # include "List.hpp"
-
-namespace ft {
+namespace ft {// start namespace ft
 // --------------------------- base Iterator ---------------------------
 template <	class Category,
 			class T,
@@ -44,9 +41,9 @@ struct s_list;
 // 	int& operator*()	{ return *p; }
 // };
 
-// --------------------------- List Iterator ---------------------------
+// --------------------------- list Iterator ---------------------------
 template < class T > 
-class ListIterator
+class listIterator
 {
 public:
 	typedef T				value_type;
@@ -56,66 +53,71 @@ public:
 protected:
 	ft::s_list<T> *		_p;
 public:
-	ListIterator()	{}
-	virtual ~ListIterator()	{}
-	ListIterator(ft::s_list<T> * x)						{ this->_p = x;				}
-	ListIterator(ft::s_list<T> & x)						{ this->_p = x;				}
-	ListIterator(const ListIterator & x)				{ *this = x;				}
-	// ListIterator(const ListIterator & x)				{ this->_p = x._p;			}
-	ListIterator&	operator=(const ListIterator& x)	{ _p = x._p; return *this;	}
+	listIterator()		{}
+	~listIterator()		{}
+	listIterator(ft::s_list<T> * x)						{ this->_p = x;				}
+	listIterator(ft::s_list<T> & x)						{ this->_p = x;				}
+	listIterator(const listIterator & x)				{ *this = x;				}
+	listIterator&	operator=(const listIterator& x)	{ _p = x._p; return *this;	}
 
-	bool			operator==(const ListIterator& rhs) const		{ return _p==rhs._p; }
-	bool			operator!=(const ListIterator& rhs) const		{ return _p!=rhs._p; }
+	bool			operator==(const listIterator& rhs) const		{ return _p==rhs._p; }
+	bool			operator!=(const listIterator& rhs) const		{ return _p!=rhs._p; }
 
 	T&				operator*()		{ return _p->value;		}
 	T&				operator->()	{ return &_p->value;	}
-	ft::s_list<T>*	getList()		{ return _p;			}
+	ft::s_list<T>*	getlist()		{ return _p;			}
 
-	ListIterator&	operator++()			{ _p = _p->next_list; return *this;						}
-	ListIterator	operator++(int)			{ ListIterator tmp(*this); operator++(); return tmp;	}
-	ListIterator&	operator--()			{ _p = _p->prev_list; return *this;						}
-	ListIterator	operator--(int)			{ ListIterator tmp(*this); operator--(); return tmp;	}
-
-
+	listIterator&	operator++()			{ _p = _p->next_list; return *this;						}
+	listIterator	operator++(int)			{ listIterator tmp(*this); operator++(); return tmp;	}
+	listIterator&	operator--()			{ _p = _p->prev_list; return *this;						}
+	listIterator	operator--(int)			{ listIterator tmp(*this); operator--(); return tmp;	}
 };
 
-// --------------------------- Const List Iterator ---------------------------
+// --------------------------- Const list Iterator ---------------------------
 template < class T > 
-class ConstListIterator : public ListIterator<T>
+class ConstlistIterator : public listIterator<T>
 {
 public:
-	ConstListIterator()				{}
-	virtual ~ConstListIterator()	{}
-	ConstListIterator(ft::s_list<T> * x)						{ this->_p = x;						}
-	ConstListIterator(ft::s_list<T> & x)						{ this->_p = x;						}
-	ConstListIterator(const ConstListIterator& x)				{ *this = x;						}
-	ConstListIterator&	operator=(const ConstListIterator& x)	{ this->_p = x._p; return *this;	}
+	ConstlistIterator()		{}
+	~ConstlistIterator()	{}
+	ConstlistIterator(ft::s_list<T> * x)						{ this->_p = x;						}
+	ConstlistIterator(ft::s_list<T> & x)						{ this->_p = x;						}
+	ConstlistIterator(const ConstlistIterator& x)				{ *this = x;						}
+	ConstlistIterator&	operator=(const ConstlistIterator& x)	{ this->_p = x._p; return *this;	}
 
 	const T &		operator*()				{ return this->_p->value; }
 };
-// --------------------------- Reverse List Iterator ---------------------------
+// --------------------------- Reverse list Iterator ---------------------------
 template < class T > 
-class ReverseListIterator : public ListIterator<T>
+class ReverselistIterator : public listIterator<T>
 {
 public:
-	ReverseListIterator()			{}
-	virtual ~ReverseListIterator()	{}
-	ReverseListIterator(ft::s_list<T> * x)							{ this->_p = x;						}
-	ReverseListIterator(const ReverseListIterator& x)				{ this->_p = x._p;					}
-	ReverseListIterator&	operator=(const ReverseListIterator& x) { this->_p = x._p; return *this;	}
+	ReverselistIterator()		{}
+	~ReverselistIterator()		{}
+	ReverselistIterator(ft::s_list<T> * x)							{ this->_p = x;						}
+	ReverselistIterator(ft::s_list<T> & x)							{ this->_p = x;						}
+	ReverselistIterator(const ReverselistIterator& x)				{ this->_p = x._p;					}
+	ReverselistIterator&	operator=(const ReverselistIterator& x) { this->_p = x._p; return *this;	}
 
-	ReverseListIterator&	operator++()			{ this->_p = this->_p->prev_list; return *this;				}
-	ReverseListIterator		operator++(int)			{ ReverseListIterator tmp(*this); operator++(); return tmp; }
-	ReverseListIterator&	operator--()			{ this->_p = this->_p->next_list; return *this;				}
-	ReverseListIterator		operator--(int)			{ ReverseListIterator tmp(*this); operator--(); return tmp; }
+	ReverselistIterator&	operator++()			{ this->_p = this->_p->prev_list; return *this;				}
+	ReverselistIterator		operator++(int)			{ ReverselistIterator tmp(*this); operator++(); return tmp; }
+	ReverselistIterator&	operator--()			{ this->_p = this->_p->next_list; return *this;				}
+	ReverselistIterator		operator--(int)			{ ReverselistIterator tmp(*this); operator--(); return tmp; }
 };
-// --------------------------- Const Reverser List Iterator ---------------------------
+// --------------------------- Const Reverser list Iterator ---------------------------
 template < class T > 
-class ConstReverseListIterator : public ReverseListIterator<T>
+class ConstReverselistIterator : public ReverselistIterator<T>
 {
 public:
+	ConstReverselistIterator()		{}
+	~ConstReverselistIterator()		{}
+	ConstReverselistIterator(ft::s_list<T> * x)									{ this->_p = x;						}
+	ConstReverselistIterator(ft::s_list<T> & x)									{ this->_p = x;						}
+	ConstReverselistIterator(const ConstReverselistIterator& x)					{ *this = x;						}
+	ConstReverselistIterator&	operator=(const ConstReverselistIterator& x)	{ this->_p = x._p; return *this;	}
+
 	const T &		operator*()				{ return this->_p->value; }
 };
 
-}// end  of namespace ft
+}// end namespace ft
 #endif

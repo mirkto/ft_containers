@@ -3,11 +3,13 @@
 
 # include <iostream>
 # include "Iterator.hpp"
+# include "../utils/ft_enable_if.hpp"
+// # include "Identifiers.hpp"
 
 # include <list>
 # include <iterator>
 
-namespace ft {
+namespace ft {// start namespace ft
 
 // --------------------------- struct s_list ---------------------------
 template < typename T >
@@ -19,29 +21,24 @@ struct s_list
 	struct s_list	*prev_list;
 };
 
-// --------------------------- class List ---------------------------
+// --------------------------- class list ---------------------------
 template < class T, class Alloc = std::allocator<T> > 
-class List
+class list
 {
 public:
-	typedef T											value_type;
-	typedef Alloc										allocator_type;
-	typedef T &											reference;
-	typedef T const &									const_reference;
-	typedef T *											pointer;
-	typedef T const *									const_pointer;
-	typedef ptrdiff_t									difference_type;
-	typedef size_t										size_type;
+	typedef T									value_type;
+	typedef Alloc								allocator_type;
+	typedef T &									reference;
+	typedef T const &							const_reference;
+	typedef T *									pointer;
+	typedef T const *							const_pointer;
+	typedef ptrdiff_t							difference_type;
+	typedef size_t								size_type;
 
-	typedef typename ft::ListIterator<T>				iterator;
-	typedef typename ft::ConstListIterator<T>			const_iterator;
-	typedef typename ft::ReverseListIterator<T>			reverse_iterator;
-	typedef typename ft::ConstReverseListIterator<T>	const_reverse_iterator;
-
-	// typedef typename ft::ListIterator<pointer>					iterator;
-	// typedef typename ft::ListIterator<const_pointer>			const_iterator;
-	// typedef typename ft::ReverseListIterator<pointer>			reverse_iterator;
-	// typedef typename ft::ReverseListIterator<const_pointer>		const_reverse_iterator;
+	typedef ft::listIterator<T>					iterator;
+	typedef ft::ConstlistIterator<T>			const_iterator;
+	typedef ft::ReverselistIterator<T>			reverse_iterator;
+	typedef ft::ConstReverselistIterator<T>		const_reverse_iterator;
 
 private:
 	allocator_type				_alloc;
@@ -49,7 +46,7 @@ private:
 public:
 // --------------------------- Constructors ---------------------------
 	// --- default
-	explicit List(const allocator_type& alloc = allocator_type())
+	explicit list(const allocator_type& alloc = allocator_type())
 	{
 		_alloc = alloc;
 		_tail = new s_list<value_type>;
@@ -60,8 +57,7 @@ public:
 	}
 
 	// --- fill
-	explicit List(size_type n, const value_type& val = value_type(),
-						const allocator_type& alloc = allocator_type())
+	explicit list(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
 	{
 		_alloc = alloc;
 		_tail = new s_list<value_type>;
@@ -70,13 +66,14 @@ public:
 		_tail->len = 0;
 		bzero(&_tail->value, sizeof(T));
 		for (size_type i = 0; i < n; i++)
-			this->push_back(val);
+			push_back(val);
 	}
 
 	// --- range
-	template <class InputIterator, 
-	class std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type*>
-	List (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
+	template <class InputIterator>
+	list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
+		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
 	{
 		if (!first || !last)
 			std::cout << " --- empty input iterator ---" << std::endl;
@@ -91,14 +88,15 @@ public:
 	}
 
 	// --- destructor
-	virtual ~List()
+	virtual ~list()
 	{
 		clear();
 		delete _tail;
 	}
 
 	// --- copy
-	List (const List& x) {
+	list (const list& x)
+	{
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
@@ -107,7 +105,7 @@ public:
 		*this = x;
 	}
 
-	List& operator= (const List& x)
+	list& operator= (const list& x)
 	{
 		struct s_list<T>	*tmp;
 		tmp = x._tail->next_list; 
@@ -194,7 +192,9 @@ public:
 	}
 
 	template <class InputIterator>
-	void assign (InputIterator first, InputIterator last, typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = 0)
+	void assign (InputIterator first, InputIterator last,
+		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
+		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL )
 	{
 		clear();
 		for(; first != last; first++)
@@ -208,35 +208,66 @@ public:
 			push_back(val);
 	}
 
-	iterator insert (iterator position, const value_type& val);
-	void insert (iterator position, size_type n, const value_type& val);
+	iterator insert (iterator position, const value_type& val)
+	{
+		if (_tail->len == 0)
+			push_back(val);
+		else
+		{
+			s_list<value_type> *new_list;
+			new_list = new s_list<value_type>;
+			new_list->len = 0;
+			new_list->value = val;
+			new_list->next_list = position.getlist();
+			new_list->prev_list = position.getlist()->prev_list;
+			position.getlist()->prev_list->next_list = new_list;
+			position.getlist()->prev_list = new_list;
+			_tail->len++;
+		}
+		return --position;
+	}
+
+	void insert (iterator position, size_type n, const value_type& val)
+	{
+		for (; n != 0; n--)
+			insert(position, val);
+		return ;
+	}
+
 	template <class InputIterator>
-	void insert (iterator position, InputIterator first, InputIterator last);
+	void insert (iterator position, InputIterator first, InputIterator last,
+		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
+		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL )
+	{
+		for (; first != last; first++)
+			insert(position, *first);
+		return ;
+	}
 
 	iterator erase (iterator position)
 	{
-		if (position.getList() == _tail)
+		if (position.getlist() == _tail)
 			return position;
 		iterator tmp;
-		tmp = position.getList()->prev_list;
-		position.getList()->prev_list->next_list = position.getList()->next_list;
-		position.getList()->next_list->prev_list = position.getList()->prev_list;
-		delete position.getList();
+		tmp = position.getlist()->prev_list;
+		position.getlist()->prev_list->next_list = position.getlist()->next_list;
+		position.getlist()->next_list->prev_list = position.getlist()->prev_list;
+		delete position.getlist();
 		--_tail->len;
 		return tmp;
 	}
 
 	iterator erase (iterator first, iterator last)
 	{
-		iterator tmp = last.getList()->prev_list;
+		iterator tmp = last.getlist()->prev_list;
 		for (; first != last; first++)
 			erase(first);
 		return tmp;
 	}
 
-	void swap (List & x)
+	void swap (list & x)
 	{
-		List<value_type> tmp;
+		list<value_type> tmp;
 
 		tmp = *this;
 		*this = x;
@@ -259,9 +290,28 @@ public:
 	}
 
 // --------------------------- Operations ---------------------------
-	void splice (iterator position, List& x);
-	void splice (iterator position, List& x, iterator i);
-	void splice (iterator position, List& x, iterator first, iterator last);
+	void splice (iterator position, list& x)
+	{
+		iterator	it = x.begin();
+		for (; it != x.end(); it++)
+			insert(position, *it);
+		x.clear();
+	}
+
+	void splice (iterator position, list& x, iterator i)
+	{
+		insert(position, *i);
+		x.erase(i);
+	}
+
+	void splice (iterator position, list& x, iterator first, iterator last)
+	{
+		for (; first != last; first++)
+		{
+			insert(position, *first);
+			x.erase(first);
+		}
+	}
 
 	void remove (const value_type& val)
 	{
@@ -282,15 +332,50 @@ public:
 	}
 
 	template <class Predicate>
-	void remove_if (Predicate pred);
+	void remove_if (Predicate pred)
+	{
+		for (iterator it = begin(); it != end(); it++)
+			if (pred(*it))
+				erase(it);
+	}
 
-	void unique();
+	void unique()
+	{
+		for (iterator	it = begin(); it != end(); )
+			if (*it == *(++it))
+				erase(it);
+	}
+ 
 	template <class BinaryPredicate>
-	void unique (BinaryPredicate binary_pred);
+	void unique (BinaryPredicate binary_pred)
+	{
+		for (iterator	it = begin(); it != end(); )
+			if (binary_pred(*it, *(++it)))
+				erase(it);
+	}
 
-	void merge (List& x);
+	void merge (list& x)
+	{
+		for(iterator it = x.begin(); it != x.end(); it++)
+			if (*it > *begin())
+			{
+				x.splice(it, *this);
+				break ;
+			}
+		*this = x;
+		x.clear();
+	}
+
 	template <class Compare>
-	void merge (List& x, Compare comp);
+	void merge (list& x, Compare comp)
+	{
+		for(iterator it = begin(); it != end(); it++)
+			if (comp(*x.begin(), *it))
+			{
+				splice(it, x);
+				break ;
+			}
+	}
 
 	void sort()
 	{
@@ -331,7 +416,15 @@ public:
 		}
 	}
 
-	void reverse();
+	void reverse()
+	{
+		iterator	it = --end();
+		for (size_t i = size(); i != 0; i--)
+		{
+			push_back(*it);
+			erase(it--);
+		}
+	}
 
 // --------------------------- Element access ---------------------------
 	reference		front()				{ return _tail->next_list->value; }
@@ -360,26 +453,50 @@ public:
 // --------------------------- Non-member functions ---------------------------
 
 	template <class T, class Alloc>
-	void swap (List<T,Alloc>& x, List<T,Alloc>& y) { x.swap(y); }
+	void swap (list<T,Alloc>& x, list<T,Alloc>& y)
+	{ x.swap(y); }
 
 // --------------------------- Relational operators ---------------------------
 	template <class T, class Alloc>
-	bool operator== (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return false;
+		typename ft::list<T>::iterator	r_it = rhs.begin();
+		typename ft::list<T>::iterator	l_it = lhs.begin();
+		for (; l_it != lhs.end(); l_it++, r_it++)
+			if (*l_it != *r_it)
+				return false;
+		return true;
+	}
 
 	template <class T, class Alloc>
-	bool operator!= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator!= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{ return !(lhs == rhs); }
 
 	template <class T, class Alloc>
-	bool operator<  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator<  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		typename ft::list<T>::iterator	r_it = rhs.begin();
+		typename ft::list<T>::iterator	l_it = lhs.begin();
+		for (; l_it != lhs.end() && *l_it == *r_it; l_it++, r_it++)
+			;
+		if (r_it != rhs.end())
+			return true;
+		return (*l_it < *r_it);
+	}
 
 	template <class T, class Alloc>
-	bool operator<= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator<= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{ return !(rhs < lhs); }
 
 	template <class T, class Alloc>
-	bool operator>  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator>  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{ return rhs < lhs; }
 
 	template <class T, class Alloc>
-	bool operator>= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs);
+	bool operator>= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{ return !(lhs < rhs); }
 
-}// end  of namespace ft
+}// end namespace ft
 #endif
