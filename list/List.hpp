@@ -6,8 +6,8 @@
 # include "../utils/ft_enable_if.hpp"
 // # include "Identifiers.hpp"
 
-# include <list>
-# include <iterator>
+// # include <list>
+// # include <iterator>
 
 namespace ft {// start namespace ft
 
@@ -42,6 +42,7 @@ public:
 
 private:
 	allocator_type				_alloc;
+	// std::allocator<ft::s_list<value_type> >	node;
 	s_list<value_type> *		_tail;
 public:
 // --------------------------- Constructors ---------------------------
@@ -75,8 +76,8 @@ public:
 		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
 		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
 	{
-		if (!first || !last)
-			std::cout << " --- empty input iterator ---" << std::endl;
+		// if (!first || !last)
+		// 	std::cout << " --- empty input iterator ---" << std::endl;
 		_alloc = alloc;
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
@@ -140,6 +141,7 @@ public:
 		}
 		new_list->value = value;
 		++_tail->len;
+		_tail->value = _tail->len;
 	}
 
 	void			push_front( value_type value)
@@ -163,6 +165,7 @@ public:
 		}
 		new_list->value = value;
 		++_tail->len;
+		_tail->value = _tail->len;
 	}
 
 	void			pop_back()
@@ -176,6 +179,7 @@ public:
 		delete _tail->prev_list;
 		_tail->prev_list = new_back_list;
 		--_tail->len;
+		_tail->value = _tail->len;
 	}
 
 	void			pop_front()
@@ -189,6 +193,7 @@ public:
 		delete _tail->next_list;
 		_tail->next_list = new_front_list;
 		--_tail->len;
+		_tail->value = _tail->len;
 	}
 
 	template <class InputIterator>
@@ -223,6 +228,7 @@ public:
 			position.getlist()->prev_list->next_list = new_list;
 			position.getlist()->prev_list = new_list;
 			_tail->len++;
+			_tail->value = _tail->len;
 		}
 		return --position;
 	}
@@ -248,21 +254,19 @@ public:
 	{
 		if (position.getlist() == _tail)
 			return position;
-		iterator tmp;
-		tmp = position.getlist()->prev_list;
 		position.getlist()->prev_list->next_list = position.getlist()->next_list;
 		position.getlist()->next_list->prev_list = position.getlist()->prev_list;
 		delete position.getlist();
 		--_tail->len;
-		return tmp;
+		_tail->value = _tail->len;
+		return position.getlist()->next_list;
 	}
 
 	iterator erase (iterator first, iterator last)
 	{
-		iterator tmp = last.getlist()->prev_list;
 		for (; first != last; first++)
 			erase(first);
-		return tmp;
+		return first;
 	}
 
 	void swap (list & x)
@@ -292,25 +296,25 @@ public:
 // --------------------------- Operations ---------------------------
 	void splice (iterator position, list& x)
 	{
-		iterator	it = x.begin();
-		for (; it != x.end(); it++)
+		for (iterator it = x.begin(); it != x.end(); it++)
 			insert(position, *it);
 		x.clear();
 	}
 
 	void splice (iterator position, list& x, iterator i)
 	{
-		insert(position, *i);
-		x.erase(i);
+		for(iterator it = x.begin(); it != x.end(); it++)
+			if (i == it)
+			{
+				insert(position, *i);
+				x.erase(i);
+			}
 	}
 
 	void splice (iterator position, list& x, iterator first, iterator last)
 	{
 		for (; first != last; first++)
-		{
-			insert(position, *first);
-			x.erase(first);
-		}
+			splice(position, x, first);
 	}
 
 	void remove (const value_type& val)
@@ -356,12 +360,16 @@ public:
 
 	void merge (list& x)
 	{
-		for(iterator it = x.begin(); it != x.end(); it++)
-			if (*it > *begin())
-			{
-				x.splice(it, *this);
-				break ;
-			}
+		if (this->end() == x.end())
+			return ;
+		for(iterator it = begin(); it != end(); it++)
+		{
+			if (*it > *x.begin())
+				splice(it, x);
+			for (; *it == *x.begin(); x.erase(x.begin()))
+				insert(it, *x.begin());
+		}
+		x.splice(x.begin(), *this);
 		*this = x;
 		x.clear();
 	}
@@ -369,12 +377,11 @@ public:
 	template <class Compare>
 	void merge (list& x, Compare comp)
 	{
+		if (this->end() == x.end())
+			return ;
 		for(iterator it = begin(); it != end(); it++)
 			if (comp(*x.begin(), *it))
-			{
 				splice(it, x);
-				break ;
-			}
 	}
 
 	void sort()
@@ -433,10 +440,10 @@ public:
 	const_reference	back() const		{ return _tail->prev_list->value; }
 
 // --------------------------- Capacity ---------------------------
-	size_type		size() const		{ return _tail->len;		}
-	bool			empty() const		{ return _tail->len == 0;	}
-	size_type		max_size() const	{ return _alloc.max_size();	}
-										// return std::numeric_limits<difference_type>::max();
+	size_type		size() const		{ return _tail->len;			}
+	bool			empty() const		{ return _tail->len == 0;		}
+	size_type		max_size() const	{ return
+		std::numeric_limits<size_type>::max() / sizeof(ft::list<T>);	}
 
 // --------------------------- Iterators ---------------------------
 	iterator begin()						{ return iterator(_tail->next_list);				}
@@ -479,10 +486,9 @@ public:
 	{
 		typename ft::list<T>::iterator	r_it = rhs.begin();
 		typename ft::list<T>::iterator	l_it = lhs.begin();
-		for (; l_it != lhs.end() && *l_it == *r_it; l_it++, r_it++)
-			;
-		if (r_it != rhs.end())
-			return true;
+		for (; l_it != lhs.end(); l_it++, r_it++)
+			if (*l_it != *r_it)
+				break ;
 		return (*l_it < *r_it);
 	}
 
@@ -492,7 +498,7 @@ public:
 
 	template <class T, class Alloc>
 	bool operator>  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
-	{ return rhs < lhs; }
+	{ return (rhs < lhs); }
 
 	template <class T, class Alloc>
 	bool operator>= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)

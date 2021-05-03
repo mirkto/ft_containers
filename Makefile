@@ -1,7 +1,7 @@
 .PHONY: all clean re
 
 NAME	= a.out
-SRC		= *.cpp
+SRC		= *.cpp #ft_containers_tests-main/list_test.cpp
 FLAGS	= -Wall -Werror -Wextra
 CC		= clang++
 

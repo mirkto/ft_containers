@@ -1,5 +1,7 @@
 #include "for_tests.hpp"
 
+void				list_test();
+
 //start test ----------------------------------------------------------------
 void		default_list_tests()
 {
@@ -427,11 +429,19 @@ void		ft_wait()
 	sleep(1);
 }
 
+void		ft_test()
+{
+	std::list<int>	tmp1;
+	ft::list<int>	tmp2;
+	PRINT("org - " << tmp1.max_size() << "\nmy  - " << tmp2.max_size());
+}
+
 int			main()
 {
 	PRINT_PRP("\n ___---/ Start testing \\---___");
 	list_test();
 	PRINT_PRP("\n   ---\\ End of testing /---\n");
+	// ft_test();
 	ft_wait();
 	return 0; 
 }

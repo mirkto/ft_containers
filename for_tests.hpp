@@ -12,7 +12,7 @@
 // # include <typeinfo>
 // # include <iterator>
 
-# include "list/List.hpp"
+# include "list/list.hpp"
 # include <list>
 # include <iterator>
 
