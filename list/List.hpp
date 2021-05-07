@@ -2,7 +2,7 @@
 # define LIST_HPP
 
 # include <iostream>
-# include "Iterator.hpp"
+# include "list_iterator.hpp"
 # include "../utils/ft_enable_if.hpp"
 // # include "Identifiers.hpp"
 
@@ -16,7 +16,6 @@ template < typename T >
 struct s_list
 {
 	T				value;
-	size_t			len;
 	struct s_list	*next_list;
 	struct s_list	*prev_list;
 };
@@ -35,15 +34,22 @@ public:
 	typedef ptrdiff_t							difference_type;
 	typedef size_t								size_type;
 
-	typedef ft::listIterator<T>					iterator;
-	typedef ft::ConstlistIterator<T>			const_iterator;
-	typedef ft::ReverselistIterator<T>			reverse_iterator;
-	typedef ft::ConstReverselistIterator<T>		const_reverse_iterator;
+	typedef typename ft::ListIterator<T>				iterator;
+	typedef typename ft::ConstListIterator<T>			const_iterator;
+	typedef typename ft::ReverseListIterator<T>			reverse_iterator;
+	typedef typename ft::ConstReverseListIterator<T>	const_reverse_iterator;
 
 private:
 	allocator_type				_alloc;
-	// std::allocator<ft::s_list<value_type> >	node;
 	s_list<value_type> *		_tail;
+	size_t						_len;
+// --------------------------- private metods ---------------------------
+	void				tail_vallen()
+	{
+		// if (std::isdigit(_tail->value))
+			_tail->value = _len;
+	}
+
 public:
 // --------------------------- Constructors ---------------------------
 	// --- default
@@ -53,7 +59,7 @@ public:
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
-		_tail->len = 0;
+		_len = 0;
 		bzero(&_tail->value, sizeof(T));
 	}
 
@@ -64,7 +70,7 @@ public:
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
-		_tail->len = 0;
+		_len = 0;
 		bzero(&_tail->value, sizeof(T));
 		for (size_type i = 0; i < n; i++)
 			push_back(val);
@@ -76,13 +82,11 @@ public:
 		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
 		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
 	{
-		// if (!first || !last)
-		// 	std::cout << " --- empty input iterator ---" << std::endl;
 		_alloc = alloc;
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
-		_tail->len = 0;
+		_len = 0;
 		bzero(&_tail->value, sizeof(T));
 		for (; first != last; first++)
 			push_back(*first);
@@ -101,7 +105,7 @@ public:
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
-		_tail->len = 0;
+		_len = 0;
 		bzero(&_tail->value, sizeof(T));
 		*this = x;
 	}
@@ -112,8 +116,8 @@ public:
 		tmp = x._tail->next_list; 
 
 		clear();
-		if(x._tail->len != 0)
-			for(; _tail->len != x._tail->len; tmp = tmp->next_list)
+		if(x._len != 0)
+			for(; _len != x._len; tmp = tmp->next_list)
 				push_back(tmp->value);
 		return *this;
 	}
@@ -124,8 +128,7 @@ public:
 
 		s_list<value_type> *new_list;
 		new_list = new s_list<value_type>;
-		new_list->len = 0;
-		if (_tail->len == 0)
+		if (_len == 0)
 		{
 			_tail->next_list = new_list;
 			_tail->prev_list = new_list;
@@ -140,16 +143,15 @@ public:
 			new_list->next_list = _tail;
 		}
 		new_list->value = value;
-		++_tail->len;
-		_tail->value = _tail->len;
+		++_len;
+		tail_vallen();
 	}
 
 	void			push_front( value_type value)
 	{
 		s_list<value_type> *new_list;
 		new_list = new s_list<value_type>;
-		new_list->len = 0;
-		if (_tail->len == 0)
+		if (_len == 0)
 		{
 			_tail->next_list = new_list;
 			_tail->prev_list = new_list;
@@ -164,13 +166,13 @@ public:
 			new_list->prev_list = _tail;
 		}
 		new_list->value = value;
-		++_tail->len;
-		_tail->value = _tail->len;
+		++_len;
+		tail_vallen();
 	}
 
 	void			pop_back()
 	{
-		if (_tail->len == 0)
+		if (_len == 0)
 			return ;
 		s_list<value_type> *new_back_list;
 		new_back_list = _tail->prev_list->prev_list;
@@ -178,13 +180,13 @@ public:
 		_tail->prev_list->prev_list->next_list = _tail;
 		delete _tail->prev_list;
 		_tail->prev_list = new_back_list;
-		--_tail->len;
-		_tail->value = _tail->len;
+		--_len;
+		tail_vallen();
 	}
 
 	void			pop_front()
 	{
-		if (_tail->len == 0)
+		if (_len == 0)
 			return ;
 		s_list<value_type> *new_front_list;
 		new_front_list = _tail->next_list->next_list;
@@ -192,8 +194,8 @@ public:
 		_tail->next_list->next_list->prev_list = _tail;
 		delete _tail->next_list;
 		_tail->next_list = new_front_list;
-		--_tail->len;
-		_tail->value = _tail->len;
+		--_len;
+		tail_vallen();
 	}
 
 	template <class InputIterator>
@@ -209,26 +211,25 @@ public:
 	void assign (size_type n, const value_type& val)
 	{
 		clear();
-		for(; _tail->len != n; )
+		for(; _len != n; )
 			push_back(val);
 	}
 
 	iterator insert (iterator position, const value_type& val)
 	{
-		if (_tail->len == 0)
+		if (_len == 0)
 			push_back(val);
 		else
 		{
 			s_list<value_type> *new_list;
 			new_list = new s_list<value_type>;
-			new_list->len = 0;
 			new_list->value = val;
 			new_list->next_list = position.getlist();
 			new_list->prev_list = position.getlist()->prev_list;
 			position.getlist()->prev_list->next_list = new_list;
 			position.getlist()->prev_list = new_list;
-			_tail->len++;
-			_tail->value = _tail->len;
+			_len++;
+			tail_vallen();
 		}
 		return --position;
 	}
@@ -257,8 +258,8 @@ public:
 		position.getlist()->prev_list->next_list = position.getlist()->next_list;
 		position.getlist()->next_list->prev_list = position.getlist()->prev_list;
 		delete position.getlist();
-		--_tail->len;
-		_tail->value = _tail->len;
+		--_len;
+		tail_vallen();
 		return position.getlist()->next_list;
 	}
 
@@ -280,16 +281,16 @@ public:
 
 	void resize (size_type n, value_type val = value_type())
 	{
-		if (n < _tail->len)
-			while (_tail->len != n)
+		if (n < _len)
+			while (_len != n)
 				pop_back();
-		else if (n > _tail->len)
-			while (_tail->len != n)
+		else if (n > _len)
+			while (_len != n)
 				push_back(val);
 	}
 
 	void clear() {
-		while (_tail->len != 0)
+		while (_len != 0)
 			pop_back();
 	}
 
@@ -322,13 +323,13 @@ public:
 		s_list<value_type> *	tmp;
 		tmp = _tail->next_list;
 
-		for (size_type i = _tail->len; i != 0; --i)
+		for (size_type i = _len; i != 0; --i)
 		{
 			if (tmp->value == val)
 			{
 				tmp->next_list->prev_list = tmp->prev_list;
 				tmp->prev_list->next_list = tmp->next_list;
-				--_tail->len;
+				--_len;
 				delete tmp;
 			}
 			tmp = tmp->next_list;
@@ -440,8 +441,8 @@ public:
 	const_reference	back() const		{ return _tail->prev_list->value; }
 
 // --------------------------- Capacity ---------------------------
-	size_type		size() const		{ return _tail->len;			}
-	bool			empty() const		{ return _tail->len == 0;		}
+	size_type		size() const		{ return _len;			}
+	bool			empty() const		{ return _len == 0;		}
 	size_type		max_size() const	{ return
 		std::numeric_limits<size_type>::max() / sizeof(ft::list<T>);	}
 

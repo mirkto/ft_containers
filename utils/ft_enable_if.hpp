@@ -6,13 +6,11 @@
 
 namespace ft {// start namespace ft
 
-template<bool Cond, class T = void>
+template<bool B, class T = void>
 struct enable_if {};
-
+ 
 template<class T>
-struct enable_if<true, T> {
-	typedef T type;
-};
+struct enable_if<true, T> { typedef T type; };
 
 //is_integral ---
 template <typename T>

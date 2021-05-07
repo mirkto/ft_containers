@@ -12,9 +12,12 @@
 // # include <typeinfo>
 // # include <iterator>
 
+# include <iterator>
 # include "list/list.hpp"
 # include <list>
-# include <iterator>
+# include "vector/vector.hpp"
+# include <vector>
+
 
 # define CLR_GRN "\033[0;32m"
 # define CLR_YLW "\033[0;33m"
@@ -41,9 +44,19 @@ template < typename iterator >
 void			printValues(iterator begin, iterator end)
 {
 	std::cout << CLR_GRN " \\" CLR_END "Tail -> ";
-	for (; begin != end; begin++)
-		std::cout << *begin << " -> ";
+	while (begin != end)
+		std::cout << *begin++ << " -> ";
 	PRINT("Tail");
+}
+
+// for vector test values
+template < typename iterator >
+void			printVectorValues(iterator begin, iterator end)
+{
+	std::cout << CLR_GRN " \\" CLR_END "First -> | ";
+	while (begin != end)
+		std::cout << *begin++ << " | ";
+	PRINT("<- Last");
 }
 
 //for list remove_if

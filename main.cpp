@@ -84,6 +84,33 @@ void		iteratirs_tests()
 		// *test_my.begin() = "BOOM";	PRINT_BLU(" *bit_my = \"BOOM\" ") printValues(bit_my, eit_my);
 		// *bit_my = "BOOM";	PRINT_BLU(" *bit_my = \"BOOM\" ") printValues(bit_my, eit_my);
 	}
+	{
+	PRINT_YLW(" --- const_iterator 2 ---")
+	std::list<int>	l1(5, 21);
+	ft::list<int>	l2(5, 21);
+	// std::list<int>	l1;
+	// ft::list<int>	l2;
+
+	std::list<int>::iterator		i1 = l1.begin();
+	std::list<int>::const_iterator	ci1 = l1.begin();
+	// std::list<int>::reverse_iterator		i1 = l1.rbegin();
+	// std::list<int>::const_reverse_iterator	ci1 = l1.rbegin();
+	PRINT("\nstd:\nlist_test --- " << *i1 << " - " << *ci1);
+	*i1 = 5;
+	// *ci1 = 10; // const
+	ci1++;
+	PRINT("list_test --- " << *i1 << " - " << *ci1);
+
+	ft::list<int>::iterator			i2 = l2.begin();
+	ft::list<int>::const_iterator	ci2 = l2.begin();
+	// ft::list<int>::reverse_iterator			i2 = l2.rbegin();
+	// ft::list<int>::const_reverse_iterator	ci2 = l2.rbegin();
+	PRINT("\nft:\nlist_test --- " << *i2 << " - " << *ci2);
+	*i2 = 5;
+	// *ci2 = 10; // const
+	ci2++;
+	PRINT("list_test --- " << *i2 << " - " << *ci2);
+	}
 }
 
 void		capacity_tests()
@@ -429,19 +456,71 @@ void		ft_wait()
 	sleep(1);
 }
 
-void		ft_test()
+void		ft_fast_test()
 {
-	std::list<int>	tmp1;
-	ft::list<int>	tmp2;
-	PRINT("org - " << tmp1.max_size() << "\nmy  - " << tmp2.max_size());
-}
+	std::vector<int>				tmp1;
+	std::vector<std::vector<int> >	tmp1x;
+	PRINT(CLR_YLW "\n--origin vector" CLR_END);
+	PRINT("std - " << tmp1.max_size() << " | capacity - " << tmp1.capacity());
+	PRINT("push_back");// ------- push_back ---------------
+	tmp1.push_back(42);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.push_back(21);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.push_back(0);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.push_back(1);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.push_back(2);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.push_back(3);
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	PRINT("operator* and iterator++");// ------- operator* and iterator++
+	printVectorValues(tmp1.begin(), tmp1.end());
+	PRINT("vector in vector");// ------- vector in vector ---------------
+	tmp1x.push_back(tmp1);
+	PRINT("| len - " << tmp1x.size() << " | capacity - " << tmp1x.capacity());
+	printVectorValues(tmp1x[0].begin(), tmp1x[0].end());
+	PRINT("pop_back");// ------- pop_back ---------------
+	tmp1.pop_back(); tmp1.pop_back(); tmp1.pop_back();
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+	tmp1.pop_back(); tmp1.pop_back(); tmp1.pop_back();
+	// tmp1.pop_back(); // if len == 0 and pop_back again, len = 18446744073709551615
+	PRINT("| len - " << tmp1.size() << " | capacity - " << tmp1.capacity());
+
+	ft::vector<int>					tmp2;
+	ft::vector<ft::vector<int> >	tmp2x;
+	PRINT(CLR_YLW "\n--my vector" CLR_END);
+	PRINT("ft  - " << tmp2.max_size() << " | capacity - " << tmp2.capacity());
+	PRINT("push_back");// ------- push_back ---------------
+	tmp2.push_back(42);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	tmp2.push_back(21);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	tmp2.push_back(0);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	tmp2.push_back(1);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	tmp2.push_back(2);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	tmp2.push_back(3);
+	PRINT("| len - " << tmp2.size() << " | capacity - " << tmp2.capacity());
+	PRINT("operator* and iterator++");// ------- operator* and iterator++
+	printVectorValues(tmp2.begin(), tmp2.end());
+	PRINT("vector in vector");// ------- vector in vector ---------------
+	// tmp2x.push_back(tmp2);
+	// PRINT("| len - " << tmp2x.size() << " | capacity - " << tmp2x.capacity());
+	// printVectorValues(tmp2x[0].begin(), tmp2x[0].end());
+	// PRINT("pop_back");// ------- pop_back ---------------
+
+	}
 
 int			main()
 {
 	PRINT_PRP("\n ___---/ Start testing \\---___");
-	list_test();
+	// list_test();
 	PRINT_PRP("\n   ---\\ End of testing /---\n");
-	// ft_test();
+	ft_fast_test();
 	ft_wait();
 	return 0; 
 }
