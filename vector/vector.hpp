@@ -1,6 +1,6 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
-
+ 
 # include <iostream>
 # include "vector_iterator.hpp"
 
@@ -39,7 +39,28 @@ private:
 
 // --------------------------- private metods ---------------------------
 
-
+void			ft_realloc(size_type new_capacity)
+{
+	if (_len < _capacity)
+		return ;
+	if (new_capacity == 0)
+	{
+		_alloc.deallocate(_first, _capacity);
+		_first = NULL;
+		_last = NULL;
+		_capacity = 0;
+	}
+	else
+	{
+		value_type	*tmp = _alloc.allocate(new_capacity);
+		for(size_type i = 0; i < _len; i++)
+			tmp[i] = _first[i];
+		_alloc.deallocate(_first, _capacity);
+		_first = tmp;
+		_last = &tmp[_len];
+		_capacity = new_capacity;
+	}
+}
 public:
 //---------------------------- Member functions ----------------------------
 
@@ -107,28 +128,12 @@ void assign (size_type n, const value_type& val);
 
 void push_back (const value_type& val)
 {
-	value_type	*tmp;
-
-	if (_capacity == 0)
-	{
-		++_capacity;
-		_last = _alloc.allocate(1);
-		_first = _last;
-	}
-	if (_capacity == _len)
-	{
-		_capacity *= 2;
-		tmp = _alloc.allocate(_capacity);
-		for(size_type i = 0; i < _len; i++)
-			tmp[i] = _first[i];
-		_alloc.deallocate(_first, _capacity);
-		_first = tmp;
-		_last = &tmp[_len];
-	}
-
+	if(_len == 0)
+		ft_realloc(1);
+	else if(_len == _capacity)
+		ft_realloc(_capacity * 2);
 	_alloc.construct(_last, val);
-	++_last;
-	++_len;
+	_last = &_first[++_len];
 }
 
 void pop_back();
@@ -153,6 +158,7 @@ void clear()
 	_alloc.deallocate(_first, _capacity);
 	_len = 0;
 	_capacity = 0;
+	// ft_realloc(0);
 }
 
 //--------------------- Template specializations

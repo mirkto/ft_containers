@@ -10,6 +10,7 @@ struct s_list;
 template < class T >
 class ListIterator
 {
+	// template <class, class> friend class list;
 protected:
 	ft::s_list<T> *		_p;
 public:
@@ -17,20 +18,24 @@ public:
 	virtual ~ListIterator()		{}
 	ListIterator(ft::s_list<T> * x)						{ this->_p = x;				}
 	ListIterator(const ListIterator & copy)				{ *this = copy;				}
+// private:
 	ListIterator&	operator=(const ListIterator& x)	{ _p = x._p; return *this;	}
 
 	bool			operator==(const ListIterator& rhs) const		{ return _p==rhs._p; }
 	bool			operator!=(const ListIterator& rhs) const		{ return _p!=rhs._p; }
 
-	T&				operator*()		{ return _p->value;		}
-	T*				operator->()	{ return &_p->value;	}
 	ft::s_list<T>*	getlist()		{ return _p;			}
 	// ft::s_list<T>&	getlist()		{ return *_p;			}
+	// const T&		operator*() const	{ return _p->value;		}
+// public:
+	T&				operator*()		{ return _p->value;		}
+	T*				operator->()	{ return &_p->value;	}
 
-	ListIterator&	operator++()			{ _p = _p->next_list; return *this;						}
-	ListIterator	operator++(int)			{ ListIterator tmp(*this); operator++(); return tmp;	}
-	ListIterator&	operator--()			{ _p = _p->prev_list; return *this;						}
-	ListIterator	operator--(int)			{ ListIterator tmp(*this); operator--(); return tmp;	}
+
+	ListIterator&	operator++()			{ _p = _p->next_list; return *this;							}
+	ListIterator	operator++(int)			{ ListIterator tmp(*this); _p = _p->next_list; return tmp;	}
+	ListIterator&	operator--()			{ _p = _p->prev_list; return *this;							}
+	ListIterator	operator--(int)			{ ListIterator tmp(*this); _p = _p->prev_list; return tmp;	}
 };
 
 // --------------------------- Const list Iterator ---------------------------

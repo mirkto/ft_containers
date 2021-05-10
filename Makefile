@@ -2,7 +2,7 @@
 
 NAME	= a.out
 SRC		= *.cpp #ft_containers_tests-main/list_test.cpp
-FLAGS	= -g -Wall -Werror -Wextra
+FLAGS	= -Wall -Werror -Wextra #-g
 CC		= clang++
 
 all:

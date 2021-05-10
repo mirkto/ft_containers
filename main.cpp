@@ -109,6 +109,7 @@ void		iteratirs_tests()
 	*i2 = 5;
 	// *ci2 = 10; // const
 	ci2++;
+	// i2.
 	PRINT("list_test --- " << *i2 << " - " << *ci2);
 	}
 }
@@ -458,9 +459,11 @@ void		ft_wait()
 
 void		ft_fast_test()
 {
+	// ------- vector base ---------------
 	std::vector<int>				tmp1;
 	std::vector<std::vector<int> >	tmp1x;
 	PRINT(CLR_YLW "\n--origin vector" CLR_END);
+	// ------- origin vector ---------------
 	PRINT("std - " << tmp1.max_size() << " | capacity - " << tmp1.capacity());
 	PRINT("push_back");// ------- push_back ---------------
 	tmp1.push_back(42);
@@ -490,7 +493,8 @@ void		ft_fast_test()
 
 	ft::vector<int>					tmp2;
 	ft::vector<ft::vector<int> >	tmp2x;
-	PRINT(CLR_YLW "\n--my vector" CLR_END);
+	PRINT(CLR_YLW "\n--ft vector" CLR_END);
+	// ------- vector ft ---------------
 	PRINT("ft  - " << tmp2.max_size() << " | capacity - " << tmp2.capacity());
 	PRINT("push_back");// ------- push_back ---------------
 	tmp2.push_back(42);
@@ -509,7 +513,7 @@ void		ft_fast_test()
 	printVectorValues(tmp2.begin(), tmp2.end());
 	PRINT("vector in vector");// ------- vector in vector ---------------
 	// tmp2x.push_back(tmp2);
-	// PRINT("| len - " << tmp2x.size() << " | capacity - " << tmp2x.capacity());
+	PRINT("| len - " << tmp2x.size() << " | capacity - " << tmp2x.capacity());
 	// printVectorValues(tmp2x[0].begin(), tmp2x[0].end());
 	// PRINT("pop_back");// ------- pop_back ---------------
 
