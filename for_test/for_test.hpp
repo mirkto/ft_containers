@@ -1,9 +1,7 @@
-#ifndef FOR_TESTS_HPP
-# define FOR_TESTS_HPP
+#ifndef FOR_TEST_HPP
+# define FOR_TEST_HPP
 
-# include <unistd.h>
 # include <cmath>
-
 // # include <iostream>
 // # include <memory>
 // # include <string>
@@ -13,33 +11,22 @@
 // # include <iterator>
 
 # include <iterator>
-# include "list/list.hpp"
+# include "../utils/ft_header.hpp"
 # include <list>
-# include "vector/vector.hpp"
+# include "../list/list.hpp"
 # include <vector>
+# include "../vector/vector.hpp"
 
+//----------------------- for list -----------------------
+# define TEST_VAL(x)	printValues(x.begin(), x.end());
+# define TEST_SIZE(x)	PRINT(CLR_GRN "#print values: " CLR_END << "Size: " << x.size());
+# define TEST_HB(x)		PRINT(CLR_GRN "|" CLR_END << "Head: " << x.front() << " | " << x.back() << " :Back");
 
-# define CLR_GRN "\033[0;32m"
-# define CLR_YLW "\033[0;33m"
-# define CLR_BLU "\033[0;34m"
-# define CLR_RED "\033[0;31m"
-# define CLR_PRP "\033[0;35m"
-# define CLR_END "\033[0m"
+# define TEST_LIST		TEST_SIZE(test)	TEST_HB(test)	TEST_VAL(test)
+# define TEST(x)		TEST_SIZE(x)	TEST_HB(x)		TEST_VAL(x)
 
-# define PRINT(x) std::cout << x << std::endl
-# define PRINT_YLW(x) PRINT(CLR_YLW << x << CLR_END);
-# define PRINT_PRP(x) PRINT(CLR_PRP << x << CLR_END);
-# define PRINT_BLU(x) std::cout << CLR_BLU << x << CLR_END << ": ";
+# define TEST_ITER(x,y)	PRT_BLU(x) TEST_VAL(y)
 
-# define TEST_SIZE(x) std::cout << CLR_GRN "#print values: " CLR_END << "Size: " << x.size() << std::endl;
-# define TEST_HB(x) std::cout << CLR_GRN "|" CLR_END << "Head: " << x.front() << " | " << x.back() << " :Back" << std::endl;
-
-# define TEST_LIST TEST_SIZE(test) TEST_HB(test) printValues(test.begin(), test.end());
-# define TEST(x) TEST_SIZE(x) TEST_HB(x) printValues(x.begin(), x.end());
-# define TEST_ITER(x,y) PRINT_BLU(x) printValues(y.begin(), y.end());
-# define TEST_VAL(y) printValues(y.begin(), y.end());
-
-// for list test values
 template < typename iterator >
 void			printValues(iterator begin, iterator end)
 {
@@ -48,24 +35,28 @@ void			printValues(iterator begin, iterator end)
 		std::cout << *begin++ << " -> ";
 	PRINT("Tail");
 }
+//----------------------- for vector -----------------------
+# define TEST_VECTOR_VAL(x)		printVectorValues(x.begin(), x.end());
+# define TEST_VECTOR_HEAD(x)	PRT( CLR_GRN "#" CLR_END << " len - " << x.size() << " | capacity - " << x.capacity() << " ");
+# define TEST_VECTOR(x)			TEST_VECTOR_HEAD(x) TEST_VECTOR_VAL(x)
 
-// for vector test values
 template < typename iterator >
 void			printVectorValues(iterator begin, iterator end)
 {
-	std::cout << CLR_GRN " \\" CLR_END "First -> | ";
+	std::cout << CLR_GRN "\\" CLR_END "First -> | ";
 	while (begin != end)
 		std::cout << *begin++ << " | ";
 	PRINT("<- Last");
 }
 
+//----------------------- others --------------------------
 //for list remove_if
 bool		single_digit (const int& value)
 { return (value<10); }
 
 struct is_odd {
-	bool	operator() (const int& value)
-	{ return (value%2)==1; }
+	bool	operator()(const int& value)
+	{	 return (value%2)==1;			}
 };
 
 //for list sort_comp
@@ -86,8 +77,8 @@ bool		same_integral_part (double first, double second)
 { return ( int(first)==int(second) ); }
 
 struct is_near {
-	bool	operator() (double first, double second)
-	{ return (fabs(first-second)<5.0); }
+	bool	operator()(double first, double second)
+	{	return (fabs(first-second)<5.0); }
 };
 
 //for list merge

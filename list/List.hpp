@@ -3,11 +3,8 @@
 
 # include <iostream>
 # include "list_iterator.hpp"
-# include "../utils/ft_enable_if.hpp"
+// # include "../utils/ft_enable_if.hpp"
 // # include "Identifiers.hpp"
-
-// # include <list>
-// # include <iterator>
 
 namespace ft {// start namespace ft
 
@@ -80,8 +77,8 @@ public:
 	// --- range
 	template <class InputIterator>
 	list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
 		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
+		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
 	{
 		_alloc = alloc;
 		_tail = new s_list<value_type>;

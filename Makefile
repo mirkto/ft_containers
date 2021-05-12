@@ -1,8 +1,8 @@
 .PHONY: all clean re
 
 NAME	= a.out
-SRC		= *.cpp #ft_containers_tests-main/list_test.cpp
-FLAGS	= -Wall -Werror -Wextra #-g
+SRC		= main.cpp for_test/*.cpp # ft_containers_tests-main/list_test.cpp
+FLAGS	= -Wall -Werror -Wextra # -g
 CC		= clang++
 
 all:

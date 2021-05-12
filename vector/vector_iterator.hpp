@@ -22,8 +22,8 @@ public:
 	bool			operator==(const VectorIterator& rhs) const		{ return _p==rhs._p; }
 	bool			operator!=(const VectorIterator& rhs) const		{ return _p!=rhs._p; }
 
-	// const T&		operator*() const	{ return *_p;	}
-	// const T*		operator->() const	{ return &_p;	}
+	const T&		operator*() const	{ return *_p;	}
+	const T*		operator->() const	{ return &_p;	}
 	T&				operator*()			{ return *_p;	}
 	T*				operator->()		{ return &_p;	}
 	T*				getVector()			{ return _p;	}
@@ -31,15 +31,15 @@ public:
 	T&				operator[](const size_t &x)			{ return *(_p + x); }
 	const T&		operator[](const size_t &x) const	{ return *(_p + x); }
 
-	VectorIterator&	operator++()			{ ++_p; return *this;									}
+	VectorIterator&	operator++()			{ ++_p; return *this;							}
 	VectorIterator	operator++(int)			{ VectorIterator tmp(*this); ++_p; return tmp;	}
-	VectorIterator&	operator--()			{ --_p; return *this;									}
+	VectorIterator&	operator--()			{ --_p; return *this;							}
 	VectorIterator	operator--(int)			{ VectorIterator tmp(*this); --_p; return tmp;	}
 
 	std::ptrdiff_t	operator-(const VectorIterator& x)	{ return this->_p - x._p;	}
 	std::ptrdiff_t	operator+(const VectorIterator& x)	{ return this->_p + x._p;	}
-	VectorIterator	operator-(const size_t& x)			{ return this->_p - x;	}
-	VectorIterator	operator+(const size_t& x)			{ return this->_p + x;	}
+	VectorIterator	operator-(const size_t& x)			{ return this->_p - x;		}
+	VectorIterator	operator+(const size_t& x)			{ return this->_p + x;		}
 	void			operator-=(std::ptrdiff_t n)		{ return _p -= n;			}
 	void			operator+=(std::ptrdiff_t n)		{ return _p += n;			}
 	bool			operator>(const VectorIterator& x)	{ return _p > x._p;			}
