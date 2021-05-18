@@ -100,6 +100,7 @@ public:
 	// --- copy
 	list (const list& x)
 	{
+		// _alloc = x.alloc;
 		_tail = new s_list<value_type>;
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
@@ -110,12 +111,10 @@ public:
 
 	list& operator= (const list& x)
 	{
-		struct s_list<T>	*tmp;
-		tmp = x._tail->next_list; 
-
 		clear();
+		struct s_list<T>	*tmp;
 		if(x._len != 0)
-			for(; _len != x._len; tmp = tmp->next_list)
+			for(tmp = x._tail->next_list; _len != x._len; tmp = tmp->next_list)
 				push_back(tmp->value);
 		return *this;
 	}

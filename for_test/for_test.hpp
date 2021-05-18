@@ -16,6 +16,10 @@
 # include "../list/list.hpp"
 # include <vector>
 # include "../vector/vector.hpp"
+# include <queue>
+# include "../queue/queue.hpp"
+# include <stack>
+# include "../stack/stack.hpp"
 
 //----------------------- for list -----------------------
 # define TEST_VAL(x)	printValues(x.begin(), x.end());

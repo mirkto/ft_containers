@@ -22,7 +22,7 @@
 
 void	list_test();
 void		default_list_tests();
-void		iteratirs_tests();
+void		iterators_tests();
 void		capacity_tests();
 void		element_access_tests();
 void		modifiers_tests();
@@ -32,14 +32,31 @@ void		non_member_function_overloads();
 
 void	vector_test();
 void		vector_base();
-// void		iteratirs_vector();
+void		iterators_vector();
 void		capacity_vector();
-// void		element_access_vector();
-// void		modifiers_vector();
-// void		non_member_function_overloads_vector();
+void		element_access_vector();
+void		modifiers_vector();
+void		non_member_function_overloads_vector();
 
-// void	stack_test();
-// void	queue_test();
-// void	map_test();
+void	queue_test();
+void		queue_base();
+void		push_pop_queue();
+void		non_member_function_overloads_queue();
+
+void	stack_test();
+void		stack_base();
+void		push_pop_stack();
+void		non_member_function_overloads_stack();
+
+void	map_test();
+void		map_base();
+void		iterators_map();
+void		capacity_map();
+void		element_access_map();
+void		modifiers_map();
+void		map_observers();
+void		map_operations();
+
+void	ft_fast_test();
 
 #endif
