@@ -1,41 +1,71 @@
-#ifndef map_ITERATOR_HPP
-# define map_ITERATOR_HPP
+#ifndef MAP_ITERATOR_HPP
+# define MAP_ITERATOR_HPP
 
 namespace ft {// start namespace ft
 
-template <class Key, typename T >
+template < class T >// <class Key, class T> //
 struct s_map;
 
 // --------------------------- map Iterator ---------------------------
 template < class T >
 class MapIterator
 {
-	// template <class, class> friend class map;
+	public:
+		typedef T 					value_type;
+		typedef value_type&			reference;
+		typedef value_type*			pointer;
+		typedef std::ptrdiff_t		difference_type;
 protected:
-	ft::s_map<T> *		_p;
+	ft::s_map<T>	*_p;
 public:
 	MapIterator()				{}
 	virtual ~MapIterator()		{}
-	MapIterator(ft::s_map<T> * x)						{ this->_p = x;				}
-	MapIterator(const MapIterator & copy)				{ *this = copy;				}
-// private:
-	MapIterator&	operator=(const MapIterator& x)	{ _p = x._p; return *this;	}
+	MapIterator(ft::s_map<T> &x)			{ _p = x;		}
+	MapIterator(ft::s_map<T> *x)			{ _p = x;		}
+	MapIterator(const MapIterator &copy)	{ *this = copy;	}
+	MapIterator&			operator=(const ft::s_map<T> & x)
+	{ if(_p != x) _p = x; return _p;	}
 
-	bool			operator==(const MapIterator& rhs) const		{ return _p==rhs._p; }
-	bool			operator!=(const MapIterator& rhs) const		{ return _p!=rhs._p; }
+	// MapIterator(T *x)							{ *_p->value = x;			}
+	// MapIterator&	operator=(const MapIterator& x)	{ _p = x._p; return *this;	}
+	
+// --------------------------- class map ---------------------------
+	bool		operator==(const MapIterator& rhs) const	{ return _p==rhs._p; }
+	bool		operator!=(const MapIterator& rhs) const	{ return _p!=rhs._p; }
 
-	ft::s_map<T>*	getmap()		{ return _p;			}
-	// ft::s_map<T>&	getmap()		{ return *_p;			}
-	// const T&		operator*() const	{ return _p->value;		}
-// public:
-	T&				operator*()		{ return _p->value;		}
-	T*				operator->()	{ return &_p->value;	}
+	T&			operator*()		{ return _p->value;		} // (*it).first
+	T*			operator->()	{ return &(_p->value);	} // it->first
+	// reference	operator*()		{ return _p->value;		}
+	// pointer		operator->()	{ return &(_p->value);	} // return &(this->operator*());
+	const T&	operator*() const	{ return _p->value;		}
+	const T*	operator->() const	{ return &(_p->value);	}
 
+	MapIterator&	operator++()
+	{
+		if(!_p)
+			return *this;
+		_p = _p->left;
+		return *this;
+	}
+	MapIterator	operator++(int)	{ MapIterator tmp(*this);	operator++();	return tmp; }
 
-	MapIterator&	operator++()			{ _p = _p->next_map; return *this;							}
-	MapIterator	operator++(int)			{ MapIterator tmp(*this); _p = _p->next_map; return tmp;	}
-	MapIterator&	operator--()			{ _p = _p->prev_map; return *this;							}
-	MapIterator	operator--(int)			{ MapIterator tmp(*this); _p = _p->prev_map; return tmp;	}
+	MapIterator&	operator--()
+	{
+		if(!_p)
+			return *this;
+		_p = _p->prev;
+		return *this;
+	}
+	MapIterator	operator--(int)	{ MapIterator tmp(*this);	operator--();	return tmp; }
+
+	bool	operator>(const MapIterator &x)	{ return _p > x._map; }
+	bool	operator<(const MapIterator &x)	{ return _p < x._map; }
+
+	ft::s_map<T>	*get_map()	{ return _p; }
+
+	// T&				operator[](const size_t &x)			{ return (_p + x)->value; }
+	// T&				operator[](char const &x)			{ (void)x, return *x; }
+	// reference			operator[](const size_t &x)			{ return *(_p + x); }
 };
 
 // --------------------------- Const map Iterator ---------------------------

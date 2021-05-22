@@ -9,43 +9,61 @@
 namespace ft {// start namespace ft
 
 // --------------------------- struct s_map ---------------------------
-template < class Key, typename T >
+template < class T >// <class Key, class T> // 
 struct					s_map
 {
-	std::pair<Key,T>	value;
-	struct s_map		*parent;
-	struct s_map		*right;
-	struct s_map		*left;
+	// std::pair<const Key, T>		value;
+	T							*value;
+	struct s_map				*prev;
+	struct s_map				*right;
+	struct s_map				*left;
+	// int					color; // for red/black
+	// size_t				height; // for AVL
+
+	// // construct default - clear trash
+	// s_map() { std::memset(&value, 0, sizeof(value)); }
+	// // construct default - for map<char, int>
+	// s_map() : value('a',0) { value.second = 1; }
+
+	// // construct default
+	// s_map(const Key &k, T &val ) : value(Key, T) {}
+
+	s_map() {}
+	// s_map(T * value) : value(value) {}		// for -> node(&tmp_pair)
+	s_map(T & value) : value(&value) {}		// for -> node(tmp_pair))
+	~s_map() { }
 };
 
 // --------------------------- class map ---------------------------
 template <	class Key,												// map::key_type
 			class T,												// map::mapped_type
 			class Compare = std::less<Key>,							// map::key_compare
-			class Alloc = std::allocator<std::pair<const Key,T> >	// map::allocator_type
+			class Alloc = std::allocator<std::pair<const Key,T> >	// map::allocator_type // const
 			>
 class map
 {
 	// template <class> friend class MapIterator;
 public:
-	typedef struct s_map<Key,T> 				Node;
-	typedef Key									key_type;
-	typedef T									mapped_type;
-	typedef pair<const key_type,mapped_type>	value_type;
-	typedef Compare								key_compare;
-	typedef ptrdiff_t							difference_type;
-	typedef size_t								size_type;
+	typedef const Key								key_type; // const
+	typedef T										mapped_type;
+	typedef std::pair<const key_type, mapped_type>	value_type; // const
+	typedef ft::s_map<value_type> 					node;
+	typedef std::allocator<node>					alloc_node;
 
-	typedef Alloc								allocator_type;
-	typedef allocator_type::reference			reference;
-	typedef allocator_type::const_reference		const_reference;
-	typedef allocator_type::pointer				pointer;
-	typedef allocator_type::const_pointer		const_pointer;
+	typedef Compare									key_compare;
+	typedef std::ptrdiff_t							difference_type;
+	typedef std::size_t								size_type;
 
-	typedef typename ft::MapIterator<Key,T>					iterator;
-	typedef typename ft::ConstMapIterator<Key,T>			const_iterator;
-	typedef typename ft::ReverseMapIterator<Key,T>			reverse_iterator;
-	typedef typename ft::ConstReverseMapIterator<Key,T>		const_reverse_iterator;
+	typedef Alloc										allocator_type;
+	typedef typename allocator_type::reference			reference;
+	typedef typename allocator_type::const_reference	const_reference;
+	typedef typename allocator_type::pointer			pointer;
+	typedef typename allocator_type::const_pointer		const_pointer;
+
+	typedef ft::MapIterator<value_type>					iterator;
+	typedef ft::ConstMapIterator<value_type>			const_iterator;
+	typedef ft::ReverseMapIterator<value_type>			reverse_iterator;
+	typedef ft::ConstReverseMapIterator<value_type>		const_reverse_iterator;
 
 	class value_compare
 	{
@@ -65,156 +83,166 @@ public:
 			}
 	};
 
-
 private:
-	Node	*_map;
-	Node	*_root;
-	Node	*_start;
-	Node	*_finish;
-	Node	*_tail;
-	Node	*_begin;
-	
 	allocator_type		_alloc;
-	key_compare			_key;
+	key_compare			_comp;
+	node				*_root;
 	size_t				_len;
 
+	// node				*_begin;	// = _tail;
+	// node				*_end;	// = _tail;
+	// node				*_start;	// = _tail->left, _tail->right;
+	// node				*_last;	// = _tail->prev; 
+	node			*_tail;
+	node			*_empty_node;
+
+	alloc_node		_alloc_node;
+	
+
+
 // --------------------------- private metods ---------------------------
+void			empty_tail()
+{
+	_tail = _alloc_node.allocate(1);
+	_alloc_node.construct(_tail, node());
+	// // print size_val
+	// std::cout << "size_construct: " << sizeof(*_tail) << std::endl;
+	_tail->value = nullptr;
+	_tail->prev = _tail;
+	_tail->left = _tail;
+	_tail->right = _tail;
+
+	// _begin = _alloc_node.allocate(1);	// _end = _alloc_node.allocate(1);
+	// _alloc_node.construct(_begin, s_map);	// _alloc_node.construct(_end, s_map);
+	// _begin->prev = _end;	// _begin->left = _end;	// _begin->right = _end;
+	// _end->prev = _begin;	// _end->left = _begin;	// _end->right = _begin;
+}
+
+node *			empty_node()
+{
+	node	*tmp_node = _alloc_node.allocate(1);
+	tmp_node->value = nullptr;
+	tmp_node->prev = _tail;
+	tmp_node->left = _tail;
+	tmp_node->right = _tail;
+	_empty_node = tmp_node;
+	++_len;
+	return tmp_node;
+}
+
+void			new_node(key_type k,mapped_type m)
+{
+	node			*tmp_node = empty_node();
+	value_type		tmp_pair = value_type(k, m);
+	
+	// // --- print value of new node
+	// std::cout << "new_node - |" << tmp_pair.first << "/" << tmp_pair.second << "|" << std::endl;
+
+	// _alloc_node.construct(tmp_node, node(&tmp_pair)); // for . s_map(T * value) : value(value) {}
+	_alloc_node.construct(tmp_node, node(tmp_pair)); // for -> s_map(T & value) : value(&value) {}
+
+	// --- print value of new node
+	std::cout << "map_key: '" << (tmp_node->value)->first << "' | map_value: \"" << (tmp_node->value)->second << "\"" << std::endl;
+
+	if(_len == 0)
+	{
+		_root = tmp_node;
+		_root->prev = _tail;
+		_root->left = _tail;
+		_root->right = _tail;
+		_tail->prev = _root;
+		_tail->left = _root;
+		_tail->right = _root;
+	}
+	else
+	{
+		_empty_node = tmp_node;
+		_tail->left->left = _empty_node;
+		_empty_node->prev = _tail->prev;
+		_tail->prev = _empty_node;
+		_empty_node->left = _tail;
+	}
+}
+
+// map(node & node, value_type & pair)
+// {
+// 	_alloc_node.construct(node, node(pair));
+// }
+
+// map(value_type & pair)
+// {
+	
+// }
 
 public:
+void		add_node(key_type k,mapped_type m)
+{
+	new_node(k, m);
+}
+
 // --------------------------- Constructors ---------------------------
 	// --- default
 	explicit map(const key_compare& comp = key_compare(),
-					const allocator_type& alloc = allocator_type());
-	// {
-	// 	_alloc = alloc;
-	// 	_tail = new s_map<value_type>;
-	// 	_tail->next_map = _tail;
-	// 	_tail->prev_map = _tail;
-	// 	_len = 0;
-	// 	bzero(&_tail->value, sizeof(T));
-	// }
+					const allocator_type& alloc = allocator_type())
+	: _alloc(alloc), _comp(comp), _root(NULL), _len(0)
+	{
+		empty_tail();
+		// empty_node();
+		// _new_node('X',21);
+		// // test key/val
+		// std::cout << "! - |" << (_tail->value).first << "/" << (_tail->value).second << "|" << std::endl;
+
+	}
 
 	// --- range
 	template <class InputIterator>
 	map (InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type());
-	// {
-	// 	_alloc = alloc;
-	// 	_tail = new s_map<value_type>;
-	// 	_tail->next_map = _tail;
-	// 	_tail->prev_map = _tail;
-	// 	_len = 0;
-	// 	bzero(&_tail->value, sizeof(T));
-	// 	for (; first != last; first++)
-	// 		push_back(*first);
-	// }
 
 	// --- destructor
-	virtual ~map();
-	// {
-	// 	clear();
-	// 	delete _tail;
-	// }
+	virtual ~map()
+	{
+		clear();
+
+		_alloc_node.destroy(_tail);
+		_alloc_node.deallocate(_tail, 1);
+		if(_len == 0)
+			return ;
+		_alloc_node.destroy(_empty_node);
+		_alloc_node.deallocate(_empty_node, 1);
+	}
 
 	// --- copy
 	map (const map& x);
-	// {
-	// 	// _alloc = x.alloc;
-	// 	_tail = new s_map<value_type>;
-	// 	_tail->next_map = _tail;
-	// 	_tail->prev_map = _tail;
-	// 	_len = 0;
-	// 	bzero(&_tail->value, sizeof(T));
-	// 	*this = x;
-	// }
-
 	map& operator= (const map& x);
-	// {
-	// 	clear();
-	// 	struct s_map<T>	*tmp;
-	// 	if(x._len != 0)
-	// 		for(tmp = x._tail->next_map; _len != x._len; tmp = tmp->next_map)
-	// 			push_back(tmp->value);
-	// 	return *this;
-	// }
 
 // --------------------------- Modifiers ---------------------------
-//single element (1)	
-pair<iterator,bool> insert (const value_type& val);
-	// iterator insert (iterator position, const value_type& val)
-	// {
-	// 	if (_len == 0)
-	// 		push_back(val);
-	// 	else
-	// 	{
-	// 		s_map<value_type> *new_map;
-	// 		new_map = new s_map<value_type>;
-	// 		new_map->value = val;
-	// 		new_map->next_map = position.getmap();
-	// 		new_map->prev_map = position.getmap()->prev_map;
-	// 		position.getmap()->prev_map->next_map = new_map;
-	// 		position.getmap()->prev_map = new_map;
-	// 		_len++;
-	// 		tail_vallen();
-	// 	}
-	// 	return --position;
-	// }
+	//single element (1)	
+	std::pair<iterator,bool> insert (const value_type& val);
 
-//with hint (2)	
-iterator insert (iterator position, const value_type& val);
+	//with hint (2)	
+	iterator insert (iterator position, const value_type& val);
 
-//range (3)	
-template <class InputIterator>
-void insert (InputIterator first, InputIterator last);
-	// template <class InputIterator>
-	// void insert (iterator position, InputIterator first, InputIterator last,
-	// 	typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
-	// 	// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL )
-	// {
-	// 	for (; first != last; first++)
-	// 		insert(position, *first);
-	// 	return ;
-	// }
+	//range (3)	
+	template <class InputIterator>
+	void insert (InputIterator first, InputIterator last);
 
 	void erase (iterator position);
-	// iterator erase (iterator position)
-	// {
-	// 	if (position.getmap() == _tail)
-	// 		return position;
-	// 	position.getmap()->prev_map->next_map = position.getmap()->next_map;
-	// 	position.getmap()->next_map->prev_map = position.getmap()->prev_map;
-	// 	delete position.getmap();
-	// 	--_len;
-	// 	tail_vallen();
-	// 	return position.getmap()->next_map;
-	// }
 
 	size_type erase (const key_type& k);
 
 	void erase (iterator first, iterator last);
-	// iterator erase (iterator first, iterator last)
-	// {
-	// 	for (; first != last; first++)
-	// 		erase(first);
-	// 	return first;
-	// }
 
 	void swap (map& x);
-	// void swap (map & x)
-	// {
-	// 	map<value_type> tmp;
 
-	// 	tmp = *this;
-	// 	*this = x;
-	// 	x = tmp;
-	// }
-
-	void clear();
-	// void clear() {
-	// 	while (_len != 0)
-	// 		pop_back();
-	// }
+	void clear()
+	{
+		if(_len == 0)
+			return ;
+		// _alloc_node.destroy(_root);
+		// _alloc_node.deallocate(_root, 1);
+	}
 
 // --------------------------- Operations ---------------------------
 	iterator find (const key_type& k);
@@ -228,22 +256,22 @@ void insert (InputIterator first, InputIterator last);
 	iterator upper_bound (const key_type& k);
 	const_iterator upper_bound (const key_type& k) const;
 
-	pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
-	pair<iterator,iterator>             equal_range (const key_type& k);
+	std::pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
+	std::pair<iterator,iterator>             equal_range (const key_type& k);
 
 // --------------------------- Element access ---------------------------
-	mapped_type& operator[] (const key_type& k);
-	// {
-	// 	iterator src = find(k);
-	// 	if(src.getMap() == _tail)
-	// 	{
-	// 		insert(std::make_pair(k, mapped_type()));
-	// 		src = find(k);
-	// 		return(src.getMap()->key_value.second);
-	// 	}
-	// 	else
-	// 		return(src.getMap()->key_value.second);
-	// }
+	mapped_type& operator[] (const key_type& k)
+	{
+		iterator	src = find(k);
+		if(src.getMap() == _tail)
+		{
+			insert(std::make_pair(k, mapped_type()));
+			src = find(k);
+			return(src.getMap()->value.second);
+		}
+		else
+			return(src.getMap()->value.second);
+	}
 
 // --------------------------- Capacity ---------------------------
 	size_type		size() const		{ return _len;			}
@@ -253,19 +281,19 @@ void insert (InputIterator first, InputIterator last);
 		_alloc.max_size(); }
 
 // --------------------------- Iterators ---------------------------
-	iterator begin()						{ return iterator(_tail->next_map);				}
-	iterator end()							{ return iterator(_tail);							}
-	const_iterator begin() const			{ return const_iterator(_tail->next_map);			}
-	const_iterator end() const				{ return const_iterator(_tail);						}
+	iterator begin()						{ return iterator(_tail);				}
+	iterator end()							{ return iterator(_tail);				}
+	const_iterator begin() const			;//{ return const_iterator(_tail->next_map);			}
+	const_iterator end() const				;//{ return const_iterator(_tail);						}
 
-	reverse_iterator rbegin()				{ return reverse_iterator(_tail->prev_map);		}
-	reverse_iterator rend()					{ return reverse_iterator(_tail);					}
-	const_reverse_iterator rbegin() const	{ return const_reverse_iterator(_tail->prev_map);	}
-	const_reverse_iterator rend() const		{ return const_reverse_iterator(_tail);				}
+	reverse_iterator rbegin()				;//{ return reverse_iterator(_tail->prev_map);		}
+	reverse_iterator rend()					;//{ return reverse_iterator(_tail);					}
+	const_reverse_iterator rbegin() const	;//{ return const_reverse_iterator(_tail->prev_map);	}
+	const_reverse_iterator rend() const		;//{ return const_reverse_iterator(_tail);				}
 
 // --------------------------- Observers ---------------------------
-	key_compare key_comp() const		{ return _key;					}
-	value_compare value_comp() const	{ return value_compare(_key);	}
+	key_compare key_comp() const		{ return _comp;					}
+	value_compare value_comp() const	{ return value_compare(_comp);	}
 
 //--------------------- Allocator ---------------------------
 	allocator_type		get_allocator () const	{ return _alloc; }

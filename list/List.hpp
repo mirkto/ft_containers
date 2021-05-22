@@ -77,7 +77,7 @@ public:
 	// --- range
 	template <class InputIterator>
 	list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-		typename std::enable_if<!std::numeric_limits<InputIterator>::is_specialized>::type* = NULL)
+		typename std::enable_if<! std::numeric_limits< InputIterator >::is_specialized >::type* = NULL)
 		// typename ft::enable_if<!is_integral<InputIterator>::value> * = NULL)
 	{
 		_alloc = alloc;

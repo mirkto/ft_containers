@@ -20,6 +20,8 @@
 # include "../queue/queue.hpp"
 # include <stack>
 # include "../stack/stack.hpp"
+# include <map>
+# include "../map/map.hpp"
 
 //----------------------- for list -----------------------
 # define TEST_VAL(x)	printValues(x.begin(), x.end());
@@ -88,5 +90,14 @@ struct is_near {
 //for list merge
 bool		mycomparison (double first, double second)
 { return ( int(first)<int(second) ); }
+
+//for map
+bool fncomp (char lhs, char rhs) {return lhs<rhs;}
+
+//for map
+struct classcomp {
+bool operator() (const char& lhs, const char& rhs) const
+{return lhs<rhs;}
+};
 
 #endif

@@ -1706,13 +1706,46 @@ void		non_member_function_overloads_stack()
 }
 //end test ----------------------------------- stack ---------------------------------
 
-//start test --------------------------------- stack ---------------------------------
+//start test --------------------------------- map ---------------------------------
 void		map_base()
 {
-	PRINT_YLW("\n---| stack base tests | ---")
+	PRINT_YLW("\n---| map base tests | ---")
 	PRINT(CLR_YLW "\n-- constructing map" CLR_END);// ------- constructing queues ---------------
 	{
 		PRINT_BLU("std")
+		std::map<char,int> first;
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+		first['d']=70;
+		std::map<char,int> second (first.begin(),first.end());
+		std::map<char,int> third (second);
+		std::map<char,int,classcomp> fourth;
+		bool(*fn_pt)(char,char) = fncomp;
+		std::map<char,int,bool(*)(char,char)> fifth (fn_pt);
+	}
+	{
+		PRINT_BLU("ft ")
+		ft::map<char,int> first; // --- default
+		// first.new_node('a',21);
+		// // --- operator[]
+		// first['a']=10;
+		// first['b']=30;
+		// first['c']=50;
+		// first['d']=70;
+		// // --- range
+		// std::map<char,int> second (first.begin(),first.end());
+		// // --- copy
+		// std::map<char,int> third (second);
+		// // --- class as Compare
+		// std::map<char,int,classcomp> fourth;
+		// // --- function pointer as Compare
+		// bool(*fn_pt)(char,char) = fncomp;
+		// std::map<char,int,bool(*)(char,char)> fifth (fn_pt);
+
+		first.add_node('a',0);
+		first.add_node('b',21);
+		first.add_node('c',42);
 		
 	}
 }

@@ -57,7 +57,11 @@ void		ft_wait()
 	PRINT("\n10 seconds to complete the test\n...");
 	sleep(5);
 	for (int i = 5; i != 1; sleep(1))
+	{
 		PRINT(i-- << " seconds left");
+		// if(std::cin)
+		// 	return ;
+	}
 	PRINT("1 second left");
 	sleep(1);
 }
