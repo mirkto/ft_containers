@@ -1723,10 +1723,29 @@ void		map_base()
 		std::map<char,int,classcomp> fourth;
 		bool(*fn_pt)(char,char) = fncomp;
 		std::map<char,int,bool(*)(char,char)> fifth (fn_pt);
+		PRINT("1 :" << first.begin()->second << "|");
+		PRINT("2 :" << (*first.begin()).second << "|");
+
+		ENDL
+		std::map<char,std::string> test;
+		PRT("size :" << test.size() << "|");
+		test['a']="7";		PRT(" " << test.size() << "|");
+		test['b']="21";		PRT(" " << test.size() << "|");
+		test['c']="42";		PRINT(" " << test.size() << "|");
+		std::map<char,std::string>::iterator		it = test.begin();
+		std::map<char,std::string>::iterator		ite = test.end();
+		int i = 0;
+		for(; it != ite; ++it, ++i)
+			PRINT(i << ": '"<< it->first << "'/" << it->second << "|");
+		// PRINT(i << ": '"<< it->first << "'/" << it->second << "|");
+		PRINT("---");
+		for(--ite, --i, it = test.begin(); it != ite; --ite, --i)
+			PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
+		PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
 	}
 	{
 		PRINT_BLU("ft ")
-		ft::map<char,int> first; // --- default
+		ft::map<char,int> test; // first; // --- default
 		// first.new_node('a',21);
 		// // --- operator[]
 		// first['a']=10;
@@ -1743,10 +1762,37 @@ void		map_base()
 		// bool(*fn_pt)(char,char) = fncomp;
 		// std::map<char,int,bool(*)(char,char)> fifth (fn_pt);
 
-		first.add_node('a',0);
-		first.add_node('b',21);
-		first.add_node('c',42);
-		
+
+		// ++it;
+		PRT("size :" << test.size() << "|");
+		test.mini_insert('a',7);		PRT(" " << test.size() << "|");
+		test.mini_insert('b',21);		PRT(" " << test.size() << "|");
+		test.mini_insert('c',42);		PRINT(" " << test.size() << "|");
+		ft::map<char,int>::iterator		it = test.begin();
+		ft::map<char,int>::iterator		ite = test.end();
+		int i = 0;
+		for(; it != ite; ++it, ++i)
+			PRINT(i << ": '"<< it->first << "'/" << it->second << "|");
+		// PRINT(i << ": '"<< it->first << "'/" << it->second << "|");
+		PRINT("---");
+		for(--ite, --i, it = test.begin(); it != ite; --ite, --i)
+			PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
+		PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
+
+		// ft::map<char,int>::reverse_iterator		rit = test.rbegin();
+		// ft::map<char,int>::reverse_iterator		rite = test.rend();
+		// for(int i = 0; rit != rite; ++rit, ++i)
+		// 	PRINT(i << ": "<< rit->second << "|");
+
+		// PRINT("0 : '"<< it->first << "'/" << it->second << "|");// << test[0]);
+		// ++it;
+		// PRINT("1 : '"<< it->first << "'/" << it->second << "|");// << test[1]);
+		// ++it;
+		// PRINT("2 : '"<< it->first << "'/" << it->second << "|");// << test[2]);
+		// ++it;
+		// PRINT("3 : '"<< it->first << "'/" << it->second << "|");// << test[3]);
+		// ++it;
+		// PRINT("4 : '"<< it->first << "'/" << it->second << "|");// << test[4]);
 	}
 }
 

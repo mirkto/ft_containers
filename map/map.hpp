@@ -13,24 +13,18 @@ template < class T >// <class Key, class T> //
 struct					s_map
 {
 	// std::pair<const Key, T>		value;
-	T							*value;
+	T							value;
 	struct s_map				*prev;
 	struct s_map				*right;
 	struct s_map				*left;
 	// int					color; // for red/black
 	// size_t				height; // for AVL
 
-	// // construct default - clear trash
-	// s_map() { std::memset(&value, 0, sizeof(value)); }
-	// // construct default - for map<char, int>
-	// s_map() : value('a',0) { value.second = 1; }
-
-	// // construct default
-	// s_map(const Key &k, T &val ) : value(Key, T) {}
-
 	s_map() {}
 	// s_map(T * value) : value(value) {}		// for -> node(&tmp_pair)
-	s_map(T & value) : value(&value) {}		// for -> node(tmp_pair))
+	// s_map(T & value) : value(&value) {}		// for -> node(tmp_pair))
+	s_map(T & value) : value(value) {}
+	s_map(const T & value) : value(value) {}
 	~s_map() { }
 };
 
@@ -88,15 +82,8 @@ private:
 	key_compare			_comp;
 	node				*_root;
 	size_t				_len;
-
-	// node				*_begin;	// = _tail;
-	// node				*_end;	// = _tail;
-	// node				*_start;	// = _tail->left, _tail->right;
-	// node				*_last;	// = _tail->prev; 
-	node			*_tail;
-	node			*_empty_node;
-
-	alloc_node		_alloc_node;
+	node				*_tail;
+	alloc_node			_alloc_node;
 	
 
 
@@ -105,80 +92,98 @@ void			empty_tail()
 {
 	_tail = _alloc_node.allocate(1);
 	_alloc_node.construct(_tail, node());
-	// // print size_val
-	// std::cout << "size_construct: " << sizeof(*_tail) << std::endl;
-	_tail->value = nullptr;
 	_tail->prev = _tail;
 	_tail->left = _tail;
 	_tail->right = _tail;
-
-	// _begin = _alloc_node.allocate(1);	// _end = _alloc_node.allocate(1);
-	// _alloc_node.construct(_begin, s_map);	// _alloc_node.construct(_end, s_map);
-	// _begin->prev = _end;	// _begin->left = _end;	// _begin->right = _end;
-	// _end->prev = _begin;	// _end->left = _begin;	// _end->right = _begin;
+	// _alloc.destroy(&_tail->value);
+	// _tail->value = NULL;
 }
 
-node *			empty_node()
+void			tail_init()
 {
-	node	*tmp_node = _alloc_node.allocate(1);
-	tmp_node->value = nullptr;
+	node	*tmp_root;
+	_tail->prev = _root;
+
+	tmp_root = _root;
+	while(tmp_root->right != NULL && tmp_root->right != _tail)
+		tmp_root = tmp_root->right;
+	tmp_root->right = _tail;
+	_tail->left = tmp_root;
+
+	tmp_root = _root;
+	while(tmp_root->left != NULL)
+		tmp_root = tmp_root->left;
+	_tail->right = tmp_root;
+
+	// _tail->prev	= _root;
+	// _tail->right	= _first;
+	// _tail->left	= _last;
+}
+
+void			root_init(node * node)
+{
+	_root = node;
+	_root->prev = NULL;
+	_root->left = NULL;
+	_root->right = _tail;
+	_tail->prev = _root;
+	_tail->left = _root;
+	_tail->right = _root;
+}
+
+node			*create_node(const value_type & pair)
+{
+	node		*tmp_node;
+	tmp_node = _alloc_node.allocate(1);
+	_alloc_node.construct(tmp_node, node(pair));
 	tmp_node->prev = _tail;
-	tmp_node->left = _tail;
-	tmp_node->right = _tail;
-	_empty_node = tmp_node;
-	++_len;
+	tmp_node->left = NULL;
+	tmp_node->right = NULL;
 	return tmp_node;
 }
 
-void			new_node(key_type k,mapped_type m)
+void			add_node(const key_type & k, const mapped_type & m)
 {
-	node			*tmp_node = empty_node();
-	value_type		tmp_pair = value_type(k, m);
-	
-	// // --- print value of new node
-	// std::cout << "new_node - |" << tmp_pair.first << "/" << tmp_pair.second << "|" << std::endl;
-
-	// _alloc_node.construct(tmp_node, node(&tmp_pair)); // for . s_map(T * value) : value(value) {}
-	_alloc_node.construct(tmp_node, node(tmp_pair)); // for -> s_map(T & value) : value(&value) {}
-
-	// --- print value of new node
-	std::cout << "map_key: '" << (tmp_node->value)->first << "' | map_value: \"" << (tmp_node->value)->second << "\"" << std::endl;
+	value_type		pair = value_type(k, m);
+	node			*new_node = create_node(pair);
+	node			*tmp = _root;
+	node			*tmp_prev;
 
 	if(_len == 0)
-	{
-		_root = tmp_node;
-		_root->prev = _tail;
-		_root->left = _tail;
-		_root->right = _tail;
-		_tail->prev = _root;
-		_tail->left = _root;
-		_tail->right = _root;
-	}
+		root_init(new_node);
 	else
 	{
-		_empty_node = tmp_node;
-		_tail->left->left = _empty_node;
-		_empty_node->prev = _tail->prev;
-		_tail->prev = _empty_node;
-		_empty_node->left = _tail;
+
+		while(new_node->value.first != tmp->value.first && tmp != NULL && tmp != _tail)
+		{
+			tmp_prev = tmp;
+			if(_comp(new_node->value.first, tmp->value.first))
+				tmp = tmp->left;
+			else
+				tmp = tmp->right;
+		}
+		if(tmp == NULL || tmp == _tail)
+		{
+			if(_comp(new_node->value.first, tmp_prev->value.first))
+				tmp_prev->left = new_node;
+			else
+				tmp_prev->right = new_node;
+			new_node->prev = tmp_prev;
+		}
 	}
+	tail_init();
+	++_len;
 }
-
-// map(node & node, value_type & pair)
-// {
-// 	_alloc_node.construct(node, node(pair));
-// }
-
-// map(value_type & pair)
-// {
-	
-// }
 
 public:
-void		add_node(key_type k,mapped_type m)
-{
-	new_node(k, m);
+
+void		mini_insert(const key_type & k, const mapped_type & m)
+{	
+	add_node(k, m);
+	//balance_new_node();
 }
+
+node * const		get_tail() const	{ return &_tail; }
 
 // --------------------------- Constructors ---------------------------
 	// --- default
@@ -187,11 +192,6 @@ void		add_node(key_type k,mapped_type m)
 	: _alloc(alloc), _comp(comp), _root(NULL), _len(0)
 	{
 		empty_tail();
-		// empty_node();
-		// _new_node('X',21);
-		// // test key/val
-		// std::cout << "! - |" << (_tail->value).first << "/" << (_tail->value).second << "|" << std::endl;
-
 	}
 
 	// --- range
@@ -204,13 +204,8 @@ void		add_node(key_type k,mapped_type m)
 	virtual ~map()
 	{
 		clear();
-
 		_alloc_node.destroy(_tail);
 		_alloc_node.deallocate(_tail, 1);
-		if(_len == 0)
-			return ;
-		_alloc_node.destroy(_empty_node);
-		_alloc_node.deallocate(_empty_node, 1);
 	}
 
 	// --- copy
@@ -240,8 +235,11 @@ void		add_node(key_type k,mapped_type m)
 	{
 		if(_len == 0)
 			return ;
-		// _alloc_node.destroy(_root);
-		// _alloc_node.deallocate(_root, 1);
+		for(iterator it = begin(), ite = end(); it != ite; ++it, --_len)
+		{
+			_alloc_node.destroy(it.get_map());
+			_alloc_node.deallocate(it.get_map(), 1);
+		}
 	}
 
 // --------------------------- Operations ---------------------------
@@ -263,14 +261,14 @@ void		add_node(key_type k,mapped_type m)
 	mapped_type& operator[] (const key_type& k)
 	{
 		iterator	src = find(k);
-		if(src.getMap() == _tail)
+		if(src.get_map() == _tail)
 		{
 			insert(std::make_pair(k, mapped_type()));
 			src = find(k);
-			return(src.getMap()->value.second);
+			return(src.get_map()->value.second);
 		}
 		else
-			return(src.getMap()->value.second);
+			return(src.get_map()->value.second);
 	}
 
 // --------------------------- Capacity ---------------------------
@@ -281,14 +279,14 @@ void		add_node(key_type k,mapped_type m)
 		_alloc.max_size(); }
 
 // --------------------------- Iterators ---------------------------
-	iterator begin()						{ return iterator(_tail);				}
-	iterator end()							{ return iterator(_tail);				}
-	const_iterator begin() const			;//{ return const_iterator(_tail->next_map);			}
-	const_iterator end() const				;//{ return const_iterator(_tail);						}
+	iterator begin()						{ return iterator(_tail->right);			}
+	iterator end()							{ return iterator(_tail);					}
+	const_iterator begin() const			;//{ return const_iterator(_tail->right);			}
+	const_iterator end() const				;//{ return const_iterator(_tail);					}
 
-	reverse_iterator rbegin()				;//{ return reverse_iterator(_tail->prev_map);		}
-	reverse_iterator rend()					;//{ return reverse_iterator(_tail);					}
-	const_reverse_iterator rbegin() const	;//{ return const_reverse_iterator(_tail->prev_map);	}
+	reverse_iterator rbegin()				;//{ return reverse_iterator(_tail->left);			}
+	reverse_iterator rend()					;//{ return reverse_iterator(_tail);				}
+	const_reverse_iterator rbegin() const	;//{ return const_reverse_iterator(_tail->left);		}
 	const_reverse_iterator rend() const		;//{ return const_reverse_iterator(_tail);				}
 
 // --------------------------- Observers ---------------------------

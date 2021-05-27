@@ -13,11 +13,11 @@
 
 template<typename Key, typename T>
 struct s_tree {
-    std::pair<Key, T> *pair;
-    s_tree *left;
-    s_tree *right;
-    s_tree *parent;
-    bool isEnd;
+    std::pair<Key, T>	*pair;
+    s_tree				*left;
+    s_tree				*right;
+    s_tree				*parent;
+    bool				isEnd;
 };
 
 
@@ -28,14 +28,14 @@ class Tree
 {
 
 private:
-    s_tree<Key, T> *root;
-    s_tree<Key, T> *end;
-    s_tree<Key, T> *begin;
-    bool 	isAddPair;
-    Compare comp;
-    int tabs;
-    size_t size;
-    Alloc allocator;
+    s_tree<Key, T>		*root;
+    s_tree<Key, T>		*end;
+    s_tree<Key, T>		*begin;
+    bool				isAddPair;
+    Compare				comp;
+    int					tabs;
+    size_t				size;
+    Alloc				allocator;
 
 public:
 

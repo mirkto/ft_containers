@@ -55,9 +55,9 @@ namespace ft {
     private:
         Compare 									comp;
         allocator_type 								allocator;
-        size_type       							_size;
+        size_type									_size;
         Tree<Key, T, Compare> 						*tree;
-        std::allocator<s_tree<Key, T> >		node_allocator;
+        std::allocator<s_tree<Key, T> >				node_allocator;
 
     public:
 

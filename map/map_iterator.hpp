@@ -11,19 +11,21 @@ template < class T >
 class MapIterator
 {
 	public:
-		typedef T 					value_type;
-		typedef value_type&			reference;
-		typedef value_type*			pointer;
-		typedef std::ptrdiff_t		difference_type;
+		typedef T 							value_type;
+		typedef value_type&					reference;
+		typedef value_type*					pointer;
+		typedef std::ptrdiff_t				difference_type;
+		typedef ft::s_map<value_type>		node;
+
 protected:
-	ft::s_map<T>	*_p;
+	node	*_p;
 public:
-	MapIterator()				{}
-	virtual ~MapIterator()		{}
-	MapIterator(ft::s_map<T> &x)			{ _p = x;		}
-	MapIterator(ft::s_map<T> *x)			{ _p = x;		}
+	MapIterator()							{}
+	virtual ~MapIterator()					{}
+	MapIterator(node * ptr) : _p(ptr)		{}
+	MapIterator(node & tail) : _p(tail)		{}
 	MapIterator(const MapIterator &copy)	{ *this = copy;	}
-	MapIterator&			operator=(const ft::s_map<T> & x)
+	MapIterator&			operator=(const node & x)
 	{ if(_p != x) _p = x; return _p;	}
 
 	// MapIterator(T *x)							{ *_p->value = x;			}
@@ -44,8 +46,17 @@ public:
 	{
 		if(!_p)
 			return *this;
-		_p = _p->left;
-		return *this;
+		node	*tmp = _p;
+		// _tail->right == _first  and  _first->left == NULL
+		// _last->right == _tail   and  _tail->left  == _last
+		if(_p->right)
+			for(tmp = _p->right; tmp->left && tmp->left != _p;)
+				tmp = tmp->left;
+		else if(!_p->right && _p->prev)
+			for(tmp = _p->prev; _p->value.first > tmp->value.first && tmp->prev;)
+				tmp = tmp->prev;
+		_p = tmp;
+		return (*this);
 	}
 	MapIterator	operator++(int)	{ MapIterator tmp(*this);	operator++();	return tmp; }
 
@@ -53,15 +64,24 @@ public:
 	{
 		if(!_p)
 			return *this;
-		_p = _p->prev;
-		return *this;
+		node	*tmp = _p;
+		// _tail->left == _last  and  _last->right == _tail
+		// _last->left == tmp    and  tmp->right   == NULL
+		if (_p->left)
+			for(tmp = _p->left; tmp->right && tmp->right != _p;)
+				tmp = tmp->right;
+		else if (!_p->left && _p->prev)
+			for(tmp = _p->prev; _p->value.first < tmp->value.first && tmp->prev;)
+				tmp = tmp->prev;
+		_p = tmp;
+		return (*this);
 	}
 	MapIterator	operator--(int)	{ MapIterator tmp(*this);	operator--();	return tmp; }
 
 	bool	operator>(const MapIterator &x)	{ return _p > x._map; }
 	bool	operator<(const MapIterator &x)	{ return _p < x._map; }
 
-	ft::s_map<T>	*get_map()	{ return _p; }
+	node	*get_map()	{ return _p; }
 
 	// T&				operator[](const size_t &x)			{ return (_p + x)->value; }
 	// T&				operator[](char const &x)			{ (void)x, return *x; }
