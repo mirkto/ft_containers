@@ -7,7 +7,7 @@ template < class T >// <class Key, class T> //
 struct s_map;
 
 // --------------------------- map Iterator ---------------------------
-template < class T >
+template < class T, class Compare >
 class MapIterator
 {
 	public:
@@ -16,9 +16,11 @@ class MapIterator
 		typedef value_type*					pointer;
 		typedef std::ptrdiff_t				difference_type;
 		typedef ft::s_map<value_type>		node;
+		typedef Compare						key_compare;
 
 protected:
-	node	*_p;
+	node			*_p;
+	key_compare		_comp;
 public:
 	MapIterator()							{}
 	virtual ~MapIterator()					{}
@@ -53,7 +55,7 @@ public:
 			for(tmp = _p->right; tmp->left && tmp->left != _p;)
 				tmp = tmp->left;
 		else if(!_p->right && _p->prev)
-			for(tmp = _p->prev; _p->value.first > tmp->value.first && tmp->prev;)
+			for(tmp = _p->prev; tmp->prev && _comp(tmp->value.first, _p->value.first);)// tmp->value.first < _p->value.first
 				tmp = tmp->prev;
 		_p = tmp;
 		return (*this);
@@ -71,7 +73,7 @@ public:
 			for(tmp = _p->left; tmp->right && tmp->right != _p;)
 				tmp = tmp->right;
 		else if (!_p->left && _p->prev)
-			for(tmp = _p->prev; _p->value.first < tmp->value.first && tmp->prev;)
+			for(tmp = _p->prev; tmp->prev && _comp(_p->value.first, tmp->value.first);) // _p->value.first < tmp->value.first
 				tmp = tmp->prev;
 		_p = tmp;
 		return (*this);
@@ -89,27 +91,27 @@ public:
 };
 
 // --------------------------- Const map Iterator ---------------------------
-template < class T > 
-class ConstMapIterator : public MapIterator<T>
+template < class T, class Compare >
+class ConstMapIterator : public MapIterator<T, Compare >
 {
 public:
 	// ConstMapIterator() : MapIterator<T>()										{}
 	// ConstMapIterator(ft::s_map<T> * x) : MapIterator<T>(x)					{}
 	// ConstMapIterator(const ConstMapIterator& copy) : MapIterator<T>(copy)	{}
-	ConstMapIterator(MapIterator<T> x) : MapIterator<T>(x)					{}
+	ConstMapIterator(MapIterator<T, Compare > x) : MapIterator<T, Compare >(x)					{}
 
 	ConstMapIterator&	operator=(const ConstMapIterator& x) { this->_p = x._p; return *this;	}
 
 	const T &		operator*()				{ return this->_p->value; }
 };
 // --------------------------- Reverse map Iterator ---------------------------
-template < class T > 
-class ReverseMapIterator : public MapIterator<T>
+template < class T, class Compare >
+class ReverseMapIterator : public MapIterator<T, Compare >
 {
 public:
 	// ReverseMapIterator() : MapIterator<T>()										{}
-	ReverseMapIterator(ft::s_map<T> * x) : MapIterator<T>(x)						{}
-	ReverseMapIterator(const ReverseMapIterator& copy) : MapIterator<T>(copy)	{}
+	ReverseMapIterator(ft::s_map<T> * x) : MapIterator<T, Compare >(x)						{}
+	ReverseMapIterator(const ReverseMapIterator& copy) : MapIterator<T, Compare >(copy)	{}
 
 	ReverseMapIterator&	operator=(const ReverseMapIterator& x) { this->_p = x._p; return *this;	}
 
@@ -119,14 +121,14 @@ public:
 	ReverseMapIterator		operator--(int)			{ ReverseMapIterator tmp(*this); operator--(); return tmp; }
 };
 // --------------------------- Const Reverser map Iterator ---------------------------
-template < class T > 
-class ConstReverseMapIterator : public ReverseMapIterator<T>
+template < class T, class Compare >
+class ConstReverseMapIterator : public ReverseMapIterator<T, Compare >
 {
 public:
 	// ConstReverseMapIterator() : ReverseMapIterator<T>()											{}
 	// ConstReverseMapIterator(ft::s_map<T> * x) : ReverseMapIterator<T>(x)							{}
 	// ConstReverseMapIterator(const ConstReverseMapIterator& copy) : ReverseMapIterator<T>(copy)	{}
-	ConstReverseMapIterator(ReverseMapIterator<T> x) : ReverseMapIterator<T>(x)					{}
+	ConstReverseMapIterator(ReverseMapIterator<T, Compare > x) : ReverseMapIterator<T, Compare >(x)					{}
 
 	ConstReverseMapIterator&	operator=(const ConstReverseMapIterator& x)	{ this->_p = x._p; return *this;	}
 
