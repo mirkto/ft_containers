@@ -52,11 +52,17 @@ public:
 		// _tail->right == _first  and  _first->left == NULL
 		// _last->right == _tail   and  _tail->left  == _last
 		if(_p->right)
-			for(tmp = _p->right; tmp->left && tmp->left != _p;)
+		{
+			tmp = _p->right; 
+			while(tmp->left && tmp->left != _p)
 				tmp = tmp->left;
-		else if(!_p->right && _p->prev)
-			for(tmp = _p->prev; tmp->prev && _comp(tmp->value.first, _p->value.first);)// tmp->value.first < _p->value.first
+		}
+		else if(_p->prev)
+		{
+			tmp = _p->prev;
+			while(tmp->prev && _comp(tmp->value.first, _p->value.first))// tmp->value.first < _p->value.first
 				tmp = tmp->prev;
+		}
 		_p = tmp;
 		return (*this);
 	}
@@ -70,11 +76,17 @@ public:
 		// _tail->left == _last  and  _last->right == _tail
 		// _last->left == tmp    and  tmp->right   == NULL
 		if (_p->left)
-			for(tmp = _p->left; tmp->right && tmp->right != _p;)
+		{
+			tmp = _p->left;
+			while(tmp->right && tmp->right != _p)
 				tmp = tmp->right;
-		else if (!_p->left && _p->prev)
-			for(tmp = _p->prev; tmp->prev && _comp(_p->value.first, tmp->value.first);) // _p->value.first < tmp->value.first
+		}
+		else if ( _p->prev)
+		{
+			tmp = _p->prev;
+			while(tmp->prev && _comp(_p->value.first, tmp->value.first)) // _p->value.first < tmp->value.first
 				tmp = tmp->prev;
+		}
 		_p = tmp;
 		return (*this);
 	}

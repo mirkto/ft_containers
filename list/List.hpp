@@ -31,6 +31,9 @@ public:
 	typedef T const *							const_pointer;
 	typedef ptrdiff_t							difference_type;
 	typedef size_t								size_type;
+	typedef s_list<value_type>					node;
+	typedef s_list<value_type> *				node_ptr;
+	typedef std::allocator<node>				allocator_node;
 
 	typedef typename ft::ListIterator<T>				iterator;
 	typedef typename ft::ConstListIterator<T>			const_iterator;
@@ -39,7 +42,8 @@ public:
 
 private:
 	allocator_type				_alloc;
-	s_list<value_type> *		_tail;
+	allocator_node				_alloc_node;
+	node_ptr					_tail;
 	size_t						_len;
 // --------------------------- private metods ---------------------------
 	void				tail_vallen()
@@ -54,11 +58,13 @@ public:
 	explicit list(const allocator_type& alloc = allocator_type())
 	{
 		_alloc = alloc;
-		_tail = new s_list<value_type>;
+		// _tail = new s_list<value_type>;
+		_tail = _alloc_node.allocate(1);
+		_alloc_node.construct(_tail, node());
 		_tail->next_list = _tail;
 		_tail->prev_list = _tail;
 		_len = 0;
-		bzero(&_tail->value, sizeof(T));
+		// bzero(&_tail->value, sizeof(T));
 	}
 
 	// --- fill

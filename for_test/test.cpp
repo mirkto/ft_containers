@@ -1809,6 +1809,32 @@ void		map_base()
 		PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
 		ENDL
 		test.treeprint();
+
+		std::cout << "\n----CONST ITERATORS----\n";
+		ft::map<int, int> S;
+		std::map<int, int> Z;
+
+		S.balance_mini_insert(0, 0);
+		S.balance_mini_insert(10, 0);
+		S.balance_mini_insert(20, 0);
+		Z.insert(std::make_pair(0, 0));
+		Z.insert(std::make_pair(10, 0));
+		Z.insert(std::make_pair(20, 0));
+		for (int i = 1; i <= 5; i += 1)
+		{
+			// PRINT(-i << " " <<i+20);
+			S.balance_mini_insert(-i, i);
+			S.balance_mini_insert(i + 20, i);
+			Z.insert(std::make_pair(-i, i));
+			Z.insert(std::make_pair(i + 20, i));
+		}
+		S.treeprint();
+		// ft::map<int,int>::iterator		it = S.begin();
+		// S.erase(it);
+		S.find(-5);
+		S.find(-2);
+		S.find(25);
+		S.find(21);
 		}
 		// ft::map<char,int>::reverse_iterator		rit = test.rbegin();
 		// ft::map<char,int>::reverse_iterator		rite = test.rend();
