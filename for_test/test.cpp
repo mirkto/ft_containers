@@ -1829,38 +1829,41 @@ void		map_base()
 			STD.insert(std::make_pair(i + 20, i));
 		}
 		FT.treeprint();
-		}
-		// std::cout << "\n----FIND----\n";
-		// ft::map<int,int>::iterator		find_ft;
-		// std::map<int,int>::iterator		find_std;
-		// // S.erase(it);
-		// find_std = STD.find(-5);	PRINT("std: " << find_std->first);
-		// find_ft = FT.find(-5);	PRINT("ft : " << find_ft->first); ENDL
-		// find_std = STD.find(-2);	PRINT("std: " << find_std->first);
-		// find_ft = FT.find(-2);	PRINT("ft : " << find_ft->first); ENDL
-		// find_std = STD.find(25);	PRINT("std: " << find_std->first);
-		// find_ft = FT.find(25);	PRINT("ft : " << find_ft->first); ENDL
-		// find_std = STD.find(21);	PRINT("std: " << find_std->first);
-		// find_ft = FT.find(21);	PRINT("ft : " << find_ft->first); ENDL
-		// find_std = STD.find(10);	PRINT("std: " << find_std->first);
-		// find_ft = FT.find(10);	PRINT("ft : " << find_ft->first); ENDL
-		// // find_std = Z.find(99);	PRINT("std: " << find_std->first);
-		// // findS = S.find(99);	PRINT("ft : " << find_ft->first); ENDL
-		// std::cout << "\n----CONST FIND----\n";
-		// ft::map<int,int>::const_iterator		const_find_ft;
-		// std::map<int,int>::const_iterator		const_find_std;
-		// const_find_ft = FT.find(-5);	PRINT("ft : " << const_find_ft->first);
-		// const_find_std = STD.find(-5);	PRINT("std: " << const_find_std->first); ENDL
-		// // const_find_std = 5; // no viable overloaded '='
-		// // const_find_ft = 5; // no viable overloaded '='
-		// std::cout << "\n----ERASE----\n";
-		// ft::map<int,int>::iterator		it, ite;
-		// it = FT.begin();
-		// ite = FT.end();
-		// FT.treeprint();
+		std::cout << "\n----FIND----\n";
+		ft::map<int,int>::iterator		find_ft;
+		std::map<int,int>::iterator		find_std;
+		// S.erase(it);
+		find_std = STD.find(-5);	PRINT("std: " << find_std->first);
+		find_ft = FT.find(-5);	PRINT("ft : " << find_ft->first); ENDL
+		find_std = STD.find(-2);	PRINT("std: " << find_std->first);
+		find_ft = FT.find(-2);	PRINT("ft : " << find_ft->first); ENDL
+		find_std = STD.find(25);	PRINT("std: " << find_std->first);
+		find_ft = FT.find(25);	PRINT("ft : " << find_ft->first); ENDL
+		find_std = STD.find(21);	PRINT("std: " << find_std->first);
+		find_ft = FT.find(21);	PRINT("ft : " << find_ft->first); ENDL
+		find_std = STD.find(10);	PRINT("std: " << find_std->first);
+		find_ft = FT.find(10);	PRINT("ft : " << find_ft->first); ENDL
+		// find_std = Z.find(99);	PRINT("std: " << find_std->first);
+		// findS = S.find(99);	PRINT("ft : " << find_ft->first); ENDL
+		std::cout << "\n----CONST FIND----\n";
+		ft::map<int,int>::const_iterator		const_find_ft;
+		std::map<int,int>::const_iterator		const_find_std;
+		const_find_ft = FT.find(-5);	PRINT("ft : " << const_find_ft->first);
+		const_find_std = STD.find(-5);	PRINT("std: " << const_find_std->first); ENDL
+		// const_find_std = 5; // no viable overloaded '='
+		// const_find_ft = 5; // no viable overloaded '='
+		std::cout << "\n----ERASE----\n";
+		ft::map<int,int>::iterator		it, ite;
+		it = FT.begin();
+		ite = FT.end();
+		FT.treeprint();
 		// FT.erase(++++++it);
 		// FT.treeprint();
-		// }
+		FT.erase(------ite);
+		FT.treeprint();
+		FT.erase(----ite);
+		FT.treeprint();
+		}
 		// ft::map<char,int>::reverse_iterator		rit = test.rbegin();
 		// ft::map<char,int>::reverse_iterator		rite = test.rend();
 		// for(int i = 0; rit != rite; ++rit, ++i)

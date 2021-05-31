@@ -215,33 +215,33 @@ private:
 
 	int			_max(int a, int b) { return (a > b)? a : b; }
 
-	node_ptr	_right_rotate(node_ptr y)
+	node_ptr	_right_rotate(node_ptr node)
 	{
 		node_ptr	tmp;
 
-		tmp = y->left;
-		y->left = tmp->right;
-		tmp->right = y;
+		tmp = node->left;
+		node->left = tmp->right;
+		tmp->right = node;
 
-		tmp->prev = y->prev;
-		y->prev = tmp;
-		if(y->left != NULL)
-			y->left->prev = y;
+		tmp->prev = node->prev;
+		node->prev = tmp;
+		if(node->left != NULL)
+			node->left->prev = node;
 		return tmp; // Return new root
 	}
 
-	node_ptr	_left_rotate(node_ptr x)
+	node_ptr	_left_rotate(node_ptr node)
 	{
 		node_ptr	tmp;
 
-		tmp = x->right;
-		x->right = tmp->left;
-		tmp->left = x;
+		tmp = node->right;
+		node->right = tmp->left;
+		tmp->left = node;
 
-		tmp->prev = x->prev;
-		x->prev = tmp;
-		if(x->right != NULL)
-			x->right->prev = x;
+		tmp->prev = node->prev;
+		node->prev = tmp;
+		if(node->right != NULL)
+			node->right->prev = node;
 		return tmp; // Return new root
 	}
 
@@ -249,9 +249,7 @@ private:
 	{
 		if (x == NULL)
 			return 0;
-		int		left = _height(x->left);
-		int		right = _height(x->right);
-		return left - right;
+		return _height(x->left) - _height(x->right);
 	}
 
 	node_ptr	_balance(node_ptr node)
@@ -261,18 +259,14 @@ private:
 		if (balance == 2) // left_height is bigger
 		{
 			if(_get_balance(node->left) < 0)
-			{
 				_left_rotate(node->left);
-			}
 			return _right_rotate(node);
 		}
 
-		if (balance == -2) //  right_height is bigger
+		if (balance == -2) // right_height is bigger
 		{
 			if(_get_balance(node->right) > 0)
-			{
 				_right_rotate(node->right);
-			}
 			return _left_rotate(node);
 		}
 		return node;
@@ -311,8 +305,8 @@ private:
 			else 
 			{
 			// int result = ((p->data.first <= 1) ? 1 : log10(p->data.first) + 1);
-			std::cout << " " << p->value.first;// << " ";
-			std::cout << "|" << p->prev->value.first;
+			std::cout << " " << p->value.first << " ";
+			// std::cout << "|" << p->prev->value.first;
 			std::cout << std::setw(disp - 3) << "";
 			}
 		}
@@ -410,33 +404,51 @@ public:// --- --- --- PUBLIC:
 	template <class InputIterator>
 	void		insert (InputIterator first, InputIterator last);
 
-	void		erase (iterator position)
+	void		erase (iterator node)//position)
 	{
-		node_ptr	node;
-		// bool		check;
+		iterator	tmp = node;
 
-		// PRINT("\n! erase: " << position->first);
-		node = find(position->first).get_map();
-		PRINT("\n! erase: " << node->value.first);
+		PRINT("\n! erase: " << node.get_map()->value.first);// ---
 
-		// check = _comp(node->value.first, node->prev->value.first);
-		if(_comp(position->first, node->prev->value.first) == true)
+		if(tmp.get_map()->right)
 		{
-			PRINT(": " << node->value.first << node->prev->value.first);
-			PRINT("left: " << node->prev->left->value.first);
-			node->prev->left = NULL;
+			tmp = tmp.get_map()->right;
+			while(tmp.get_map()->left)
+				tmp = tmp.get_map()->left;
+		}
+		PRINT("tmp: " << tmp.get_map()->value.first);// ---
+		if(_comp(node.get_map()->value.first, node.get_map()->prev->value.first) == true)
+		{
+			PRINT("left: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->left->value.first);// ---
+			node.get_map()->prev->left = tmp.get_map();
 		}
 		else
 		{
-			PRINT(": " << node->value.first << node->prev->value.first);
-			PRINT("right: " << node->prev->right->value.first);
-			node->prev->right = NULL;
+			PRINT("right: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->right->value.first);// ---
+			node.get_map()->prev->right = tmp.get_map();
+			PRINT("right: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->right->value.first);// ---
 		}
-		_alloc_node.destroy(node);
-		_alloc_node.deallocate(node, 1);
+
+		tmp.get_map()->prev = node.get_map()->prev;
+		node.get_map()->left->prev = tmp.get_map();
+		tmp.get_map()->left = node.get_map()->left;
+
+		_alloc_node.destroy(node.get_map());
+		// _alloc_node.deallocate(node.get_map(), 1); // sega
 	}
 
 	size_type	erase (const key_type& k);
+	// {
+	// 	iterator	node;
+
+	// 	node = find(position->first).get_map();
+	// 	PRINT("\n! erase: " << node.get_map()->value.first);// ---
+
+	// 	_erase_root(node.get_map());
+
+	// 	_alloc_node.destroy(node.get_map());
+	// 	_alloc_node.deallocate(node.get_map(), 1);
+	// }
 
 	void		erase (iterator first, iterator last);
 
