@@ -25,7 +25,7 @@ public:
 	MapIterator()							{}
 	virtual ~MapIterator()					{}
 	MapIterator(node * ptr) : _p(ptr)		{}
-	MapIterator(node & tail) : _p(tail)		{}
+	// MapIterator(node & ptr) : _p(ptr)		{}
 	MapIterator(const MapIterator &copy)	{ *this = copy;	}
 	MapIterator&			operator=(const node & x)
 	{ if(_p != x) _p = x; return _p;	}
@@ -107,9 +107,9 @@ template < class T, class Compare >
 class ConstMapIterator : public MapIterator<T, Compare >
 {
 public:
-	// ConstMapIterator() : MapIterator<T>()										{}
+	ConstMapIterator() : MapIterator<T, Compare >()										{}
 	// ConstMapIterator(ft::s_map<T> * x) : MapIterator<T>(x)					{}
-	// ConstMapIterator(const ConstMapIterator& copy) : MapIterator<T>(copy)	{}
+	ConstMapIterator(ConstMapIterator& copy) : MapIterator<T, Compare >(copy)	{}
 	ConstMapIterator(MapIterator<T, Compare > x) : MapIterator<T, Compare >(x)					{}
 
 	ConstMapIterator&	operator=(const ConstMapIterator& x) { this->_p = x._p; return *this;	}

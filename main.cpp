@@ -69,10 +69,10 @@ void		ft_wait()
 int			main()
 {
 	PRINT_PRP("\n ___---/ Start testing \\---___");
-	list_test();
-	vector_test();
-	queue_test();
-	stack_test();
+	// list_test();
+	// vector_test();
+	// queue_test();
+	// stack_test();
 	map_test();
 	PRINT_PRP("\n   ---\\ End of testing /---\n");
 	// ft_fast_test();

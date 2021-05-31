@@ -21,8 +21,8 @@ struct s_list
 template < class T, class Alloc = std::allocator<T> > 
 class list
 {
-	// template <class> friend class ListIterator;
 public:
+
 	typedef T									value_type;
 	typedef Alloc								allocator_type;
 	typedef T &									reference;
@@ -32,7 +32,7 @@ public:
 	typedef ptrdiff_t							difference_type;
 	typedef size_t								size_type;
 	typedef s_list<value_type>					node;
-	typedef s_list<value_type> *				node_ptr;
+	typedef s_list<value_type> *					node_ptr;
 	typedef std::allocator<node>				allocator_node;
 
 	typedef typename ft::ListIterator<T>				iterator;

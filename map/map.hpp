@@ -187,6 +187,10 @@ private:
 		}
 		return new_node;
 	}
+
+	bool		_equality_check(const key_type & x, const key_type & y)
+	{ return _comp(x, y) == _comp(y, x); }
+
 	//      ----BALANCE TREE----       // --- --- ---
 	int			_height(node_ptr node, int i = 1)
 	{
@@ -213,26 +217,32 @@ private:
 
 	node_ptr	_right_rotate(node_ptr y)
 	{
-		node_ptr	x = y->left;
-		node_ptr	tmp = x->right;
+		node_ptr	tmp;
 
-		x->right = y;
-		y->left = tmp;
+		tmp = y->left;
+		y->left = tmp->right;
+		tmp->right = y;
 
-		y->prev = x;
-		return x; // Return new root
+		tmp->prev = y->prev;
+		y->prev = tmp;
+		if(y->left != NULL)
+			y->left->prev = y;
+		return tmp; // Return new root
 	}
 
 	node_ptr	_left_rotate(node_ptr x)
 	{
-		node_ptr	y = x->right;
-		node_ptr	tmp = y->left;
+		node_ptr	tmp;
 
-		y->left = x;
-		x->right = tmp;
+		tmp = x->right;
+		x->right = tmp->left;
+		tmp->left = x;
 
-		x->prev = y;
-		return y; // Return new root
+		tmp->prev = x->prev;
+		x->prev = tmp;
+		if(x->right != NULL)
+			x->right->prev = x;
+		return tmp; // Return new root
 	}
 
 	int			_get_balance(node_ptr  x)
@@ -251,14 +261,18 @@ private:
 		if (balance == 2) // left_height is bigger
 		{
 			if(_get_balance(node->left) < 0)
-				node->left = _left_rotate(node->left);
+			{
+				_left_rotate(node->left);
+			}
 			return _right_rotate(node);
 		}
 
 		if (balance == -2) //  right_height is bigger
 		{
 			if(_get_balance(node->right) > 0)
-				node->right = _right_rotate(node->right);
+			{
+				_right_rotate(node->right);
+			}
 			return _left_rotate(node);
 		}
 		return node;
@@ -297,7 +311,8 @@ private:
 			else 
 			{
 			// int result = ((p->data.first <= 1) ? 1 : log10(p->data.first) + 1);
-			std::cout << " " << p->value.first << " ";
+			std::cout << " " << p->value.first;// << " ";
+			std::cout << "|" << p->prev->value.first;
 			std::cout << std::setw(disp - 3) << "";
 			}
 		}
@@ -336,8 +351,6 @@ public:// --- --- --- PUBLIC:
 		++_len;
 		_root = _balance_map(_root);
 		_tail_init();
-		
-
 	}
 
 	void		mini_insert(const key_type & k, const mapped_type & m)
@@ -399,9 +412,28 @@ public:// --- --- --- PUBLIC:
 
 	void		erase (iterator position)
 	{
-		PRINT("\n! erase - " << position->first);
-		find(position->first);
+		node_ptr	node;
+		// bool		check;
 
+		// PRINT("\n! erase: " << position->first);
+		node = find(position->first).get_map();
+		PRINT("\n! erase: " << node->value.first);
+
+		// check = _comp(node->value.first, node->prev->value.first);
+		if(_comp(position->first, node->prev->value.first) == true)
+		{
+			PRINT(": " << node->value.first << node->prev->value.first);
+			PRINT("left: " << node->prev->left->value.first);
+			node->prev->left = NULL;
+		}
+		else
+		{
+			PRINT(": " << node->value.first << node->prev->value.first);
+			PRINT("right: " << node->prev->right->value.first);
+			node->prev->right = NULL;
+		}
+		_alloc_node.destroy(node);
+		_alloc_node.deallocate(node, 1);
 	}
 
 	size_type	erase (const key_type& k);
@@ -427,61 +459,24 @@ public:// --- --- --- PUBLIC:
 	}
 
 // --------------------------- Operations ---------------------------
-	bool		_equality_check(const key_type & where, const key_type & what)
+
+	iterator	find(const key_type& k)
 	{
-		bool	check;
-		check = _comp(where, what) == _comp(what, where);
-		// PRINT(_comp(where, what) << "==" << _comp(what, where) << "->" << check);
-		return check;
+		node_ptr	node = _root;
+
+		while(_equality_check(node->value.first, k) != true)
+		{
+			if(_comp(node->value.first, k) == true)
+				node = node->right;
+			else
+				node = node->left;
+			if(node == NULL)
+				return iterator(_tail);
+		}
+		// PRINT("Found: " << node->value.first); ENDL
+		return iterator(node);
 	}
-
-	node_ptr	_choice(node_ptr node, const key_type& k)
-	{
-		if(node == NULL)
-			return NULL;
-		node_ptr	tmp = node;
-		bool		check;
-
-		check = _equality_check(tmp->value.first, k);
-		// PRINT(tmp->value.first << k << "->" << check);
-		if(check == true)
-		{
-			PRINT("Find -> " << tmp->value.first << " !");
-			return tmp;
-		}
-		else if(!tmp->right)
-		{
-			PRINT("left");
-			tmp = _choice(tmp->left, k);
-		}
-		else if(!tmp->left)
-		{
-			PRINT("right");
-			tmp = _choice(tmp->right, k);
-		}
-		else if(tmp->right && tmp->left)
-		{
-			key_type	left = tmp->left->value.first;
-			key_type	right = tmp->right->value.first;
-			check = _comp(left, right);
-			// PRINT(left << right << "->" << check);
-			if(check == true)
-			{
-				PRINT("left");
-				tmp = _choice(tmp->left, k);
-			}
-			if(check == false)
-			{
-				PRINT("right");
-				tmp = _choice(tmp->right, k);
-			}
-		}
-		return tmp;
-	}
-
-	iterator	find(const key_type& k)		{ return _choice(_tail->prev, k); }
-
-	const_iterator find(const key_type& k) const;
+	const_iterator find(const key_type& k) const { return find(k); }
 
 	size_type	count(const key_type& k) const;
 
