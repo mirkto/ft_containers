@@ -1746,7 +1746,7 @@ void		map_base()
 		PRINT(i << ": '"<< ite->first << "'/" << ite->second << "|");
 	}
 	{
-		PRINT_BLU("ft ")
+		PRINT_BLU("\nft ")
 		// ft::map<char,int> first; // --- default
 		// first.new_node('a',21);
 		// // --- operator[]
@@ -1764,7 +1764,6 @@ void		map_base()
 		// bool(*fn_pt)(char,char) = fncomp;
 		// std::map<char,int,bool(*)(char,char)> fifth (fn_pt);
 		{
-		ENDL
 		ft::map<char,int> test;
 		PRT("size :" << test.size() << "|");
 		test.mini_insert('a',7);		PRT(" " << test.size() << "|");
@@ -1787,7 +1786,7 @@ void		map_base()
 		}
 		{
 		ENDL
-		PRINT("- balance -");
+		PRINT_YLW("- balance -");
 		// test.clear();
 		ft::map<char,int> test;
 		ft::map<char,int>::iterator		it, ite;
@@ -1811,7 +1810,7 @@ void		map_base()
 		test.treeprint();
 		}
 		{
-		std::cout << "\n----Balance test----\n";
+		PRINT_YLW("\n----Balance test advance----\n");
 		ft::map<int, int> FT;
 		std::map<int, int> STD;
 		FT.balance_mini_insert(1, 0);
@@ -1829,7 +1828,7 @@ void		map_base()
 			STD.insert(std::make_pair(i + 20, i));
 		}
 		FT.treeprint();
-		std::cout << "\n----FIND----\n";
+		PRINT_YLW("\n----FIND----\n");
 		ft::map<int,int>::iterator		find_ft;
 		std::map<int,int>::iterator		find_std;
 		// S.erase(it);
@@ -1845,24 +1844,30 @@ void		map_base()
 		find_ft = FT.find(10);	PRINT("ft : " << find_ft->first); ENDL
 		// find_std = Z.find(99);	PRINT("std: " << find_std->first);
 		// findS = S.find(99);	PRINT("ft : " << find_ft->first); ENDL
-		std::cout << "\n----CONST FIND----\n";
+		PRINT_YLW("\n----CONST FIND----\n")
 		ft::map<int,int>::const_iterator		const_find_ft;
 		std::map<int,int>::const_iterator		const_find_std;
 		const_find_ft = FT.find(-5);	PRINT("ft : " << const_find_ft->first);
 		const_find_std = STD.find(-5);	PRINT("std: " << const_find_std->first); ENDL
 		// const_find_std = 5; // no viable overloaded '='
 		// const_find_ft = 5; // no viable overloaded '='
-		std::cout << "\n----ERASE----\n";
-		ft::map<int,int>::iterator		it, ite;
-		it = FT.begin();
-		ite = FT.end();
-		FT.treeprint();
-		// FT.erase(++++++it);
-		// FT.treeprint();
-		FT.erase(------ite);
-		FT.treeprint();
-		FT.erase(----ite);
-		FT.treeprint();
+		PRINT_YLW("\n----ERASE----\n")
+		// ft::map<int,int>::iterator		it, ite;
+		FT.treeprint(); ENDL
+		PRINT_BLU("Erase 23" );	FT.erase(23);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 0" );		FT.erase(0);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -3" );	FT.erase(-3);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 20" );	FT.erase(20);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -2" );	FT.erase(-2);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 1" );	FT.erase(1);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -1" );	FT.erase(-1);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 24" );	FT.erase(24);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 22" );	FT.erase(22);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -5" );	FT.erase(-5);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -4" );	FT.erase(-4);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 25" );	FT.erase(25);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 10" );	FT.erase(10);	FT.treeprint(); ENDL
+		// PRINT_BLU("Erase 21" );	FT.erase(21);	FT.treeprint(); ENDL
 		}
 		// ft::map<char,int>::reverse_iterator		rit = test.rbegin();
 		// ft::map<char,int>::reverse_iterator		rite = test.rend();

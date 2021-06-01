@@ -119,9 +119,14 @@ private:
 		return tmp_root;
 	}
 
-	void		_tail_init()
+	void		_tail_unlink()
 	{
+		_tail->left->right = NULL;
+		_root->prev = NULL;
+	}
 
+	void		_tail_link()
+	{
 		_tail->prev = _root;
 		_root->prev = _tail;
 		node_ptr	last_node = _max_key();
@@ -256,16 +261,16 @@ private:
 	{
 		int	balance = _get_balance(node);
 
-		if (balance == 2) // left_height is bigger
+		if (balance > 1) // left_height is bigger
 		{
-			if(_get_balance(node->left) < 0)
+			if(_get_balance(node->left) < -1)
 				_left_rotate(node->left);
 			return _right_rotate(node);
 		}
 
-		if (balance == -2) // right_height is bigger
+		if (balance < -1) // right_height is bigger
 		{
-			if(_get_balance(node->right) > 0)
+			if(_get_balance(node->right) > 1)
 				_right_rotate(node->right);
 			return _left_rotate(node);
 		}
@@ -297,30 +302,31 @@ private:
 		{
 			if (p == NULL)
 			{
-
-			std::cout << " x ";
-			std::cout << std::setw(disp - 3) << "";
-			return;
+				std::cout << " x ";
+				std::cout << std::setw(disp - 3) << "";
+				return;
 			}
 			else 
 			{
-			// int result = ((p->data.first <= 1) ? 1 : log10(p->data.first) + 1);
-			std::cout << " " << p->value.first << " ";
-			// std::cout << "|" << p->prev->value.first;
-			std::cout << std::setw(disp - 3) << "";
+				if(p->value.first > 0)
+					std::cout << " ";
+				std::cout<< p->value.first << " ";
+				// if(p->prev)
+				// 	std::cout << "|" << p->prev->value.first;
+				std::cout << std::setw(disp - 3) << "";
 			}
 		}
 		else
 		{
 			if (p == NULL && lv >= 1)
 			{
-			_disp_lv(NULL, lv - 1, d);
-			_disp_lv(NULL, lv - 1, d);
+				_disp_lv(NULL, lv - 1, d);
+				_disp_lv(NULL, lv - 1, d);
 			}
 			else
 			{
-			_disp_lv(p->left, lv - 1, d);
-			_disp_lv(p->right, lv - 1, d);
+				_disp_lv(p->left, lv - 1, d);
+				_disp_lv(p->right, lv - 1, d);
 			}
 		}
 	}
@@ -329,6 +335,7 @@ public:// --- --- --- PUBLIC:
 
 	void		treeprint()
 	{
+		_tail_unlink();
 		int i = 0;
 		while (i <= _height(_root) - 1)
 		{
@@ -336,6 +343,7 @@ public:// --- --- --- PUBLIC:
 			i++;
 			std::cout << std::endl;
 		}
+		_tail_link();
 	}//      ----END PRINT TREE----       // --- --- ---
 
 	void		balance_mini_insert(key_type key, mapped_type val)
@@ -344,13 +352,13 @@ public:// --- --- --- PUBLIC:
 		new_node = _add_node(key, val);
 		++_len;
 		_root = _balance_map(_root);
-		_tail_init();
+		_tail_link();
 	}
 
 	void		mini_insert(const key_type & k, const mapped_type & m)
 	{	
 		_add_node(k, m);
-		_tail_init();
+		_tail_link();
 		++_len;
 	}
 
@@ -404,51 +412,110 @@ public:// --- --- --- PUBLIC:
 	template <class InputIterator>
 	void		insert (InputIterator first, InputIterator last);
 
-	void		erase (iterator node)//position)
+	// void		_end_erase(iterator position)
+	// {
+
+	// }
+
+	void		erase(iterator position)
 	{
-		iterator	tmp = node;
+		if(position == _tail)
+			return ;
+		iterator	node = position;
+		iterator	parent = position.get_map()->prev;
+		iterator	tmp = NULL;
+		int			flag = -1;
 
-		PRINT("\n! erase: " << node.get_map()->value.first);// ---
-
-		if(tmp.get_map()->right)
+		_tail_unlink();
+	// if(node.get_map())PRT("node: " << node.get_map()->value.first);// --- find node for change
+		if(node.get_map()->right != NULL)
+			++node;
+	// if(node.get_map())PRINT(" -> " << node.get_map()->value.first);// ---
+	// if(parent.get_map())PRT("parent: " << parent.get_map()->value.first);// --- relink parent with new node
+		if(parent.get_map()->right == position.get_map())
 		{
-			tmp = tmp.get_map()->right;
-			while(tmp.get_map()->left)
-				tmp = tmp.get_map()->left;
-		}
-		PRINT("tmp: " << tmp.get_map()->value.first);// ---
-		if(_comp(node.get_map()->value.first, node.get_map()->prev->value.first) == true)
-		{
-			PRINT("left: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->left->value.first);// ---
-			node.get_map()->prev->left = tmp.get_map();
+	// if(parent.get_map()->right)PRT(" -> " << parent.get_map()->right->value.first);// ---
+			parent.get_map()->right = node.get_map();
+			flag = 0;
+	// if(parent.get_map()->right)PRINT(" <- " << parent.get_map()->right->value.first);// ---
 		}
 		else
 		{
-			PRINT("right: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->right->value.first);// ---
-			node.get_map()->prev->right = tmp.get_map();
-			PRINT("right: " << node.get_map()->value.first << " -> " << node.get_map()->prev->value.first << " -> " << node.get_map()->prev->right->value.first);// ---
+	// if(parent.get_map()->left)PRT(" -> " << parent.get_map()->left->value.first);// ---
+			parent.get_map()->left = node.get_map();
+			flag = 1;
+	// if(parent.get_map()->left)PRINT(" <- " << parent.get_map()->left->value.first);// ---
 		}
 
-		tmp.get_map()->prev = node.get_map()->prev;
-		node.get_map()->left->prev = tmp.get_map();
-		tmp.get_map()->left = node.get_map()->left;
+	// if(parent.get_map())PRINT(" <- " << parent.get_map()->value.first);// ---
+		parent = node.get_map()->prev;
+	// if(parent.get_map())PRINT(" <- " << parent.get_map()->value.first);// ---
+		node.get_map()->prev = position.get_map()->prev;// --- relink new node parent
+	// if(node.get_map()->prev)PRINT(" <- " << node.get_map()->prev->value.first);// ---
 
-		_alloc_node.destroy(node.get_map());
-		// _alloc_node.deallocate(node.get_map(), 1); // sega
+		if(node.get_map() != position.get_map())
+		{
+			node.get_map()->left = position.get_map()->left;// --- relink new node left with position left
+			node.get_map()->left->prev = node.get_map();// --- relink position left with new node parent
+		}
+
+	// if(position.get_map()->right)PRINT("pos_right: " << position.get_map()->right->value.first);// ---
+	
+		if(position.get_map()->right != node.get_map())
+		// (!node.get_map()->right && !node.get_map()->left))// --- relink position left with new node parent
+		{
+	// if(parent.get_map())PRINT("parent: " << parent.get_map()->value.first);// ---
+	// if(parent.get_map()->left)PRINT("!parent->left: " << parent.get_map()->left->value.first);// ---
+	// if(node.get_map()->right)PRINT("@node->right: " << node.get_map()->right->value.first);// ---
+	// if(parent.get_map()->left->left)PRINT("parent->left->left: " << parent.get_map()->left->left->value.first);// ---
+
+			// if(parent.get_map()->left)
+			// 	if(parent.get_map()->left->left)
+			// 		tmp = parent.get_map()->left->left;
+			if(flag == 1)
+				parent.get_map()->left = NULL; //node.get_map()->right;// --- position->right->left = new node->right
+			// if(tmp.get_map())
+			// 	if(tmp.get_map()->value.first == -5)
+			// 		parent.get_map()->left = tmp.get_map();
+	// if(tmp.get_map())PRINT("tmp: " << tmp.get_map()->value.first);// ---
+			
+			// else
+			// 	parent.get_map()->left = node.get_map()->left;
+			// if(position.get_map()->right != NULL && position.get_map()->right != NULL)
+			if(flag == 1)
+				node.get_map()->right = position.get_map()->right;// --- node->right = position->right
+			else 
+				node.get_map()->prev->right = node.get_map()->right;
+			// 	node.get_map()->right = NULL;
+			// if(node.get_map()->right == NULL )
+
+	// if(parent.get_map()->left)PRINT("parent->left: " << parent.get_map()->left->value.first);// ---
+	// if(node.get_map()->right)PRINT("node->right: " << node.get_map()->right->value.first);// ---
+
+		}
+	// if(node.get_map()->right)PRINT("node_right: " << node.get_map()->right->value.first);// ---
+
+
+		position.get_map()->prev = NULL;
+		position.get_map()->left = NULL;
+		position.get_map()->right = NULL;
+		_alloc_node.destroy(position.get_map());
+		_alloc_node.deallocate(position.get_map(), 1);
+
+		--_len;
+		// _tail_link();
+		_root = _balance_map(_root);
+		_tail_link();
 	}
 
-	size_type	erase (const key_type& k);
-	// {
-	// 	iterator	node;
+	size_type	erase (const key_type& k)
+	{
+		iterator	node;
 
-	// 	node = find(position->first).get_map();
-	// 	PRINT("\n! erase: " << node.get_map()->value.first);// ---
-
-	// 	_erase_root(node.get_map());
-
-	// 	_alloc_node.destroy(node.get_map());
-	// 	_alloc_node.deallocate(node.get_map(), 1);
-	// }
+		node = find(k);
+		erase(node);
+		return 1;
+	}
 
 	void		erase (iterator first, iterator last);
 
