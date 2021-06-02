@@ -1766,11 +1766,11 @@ void		map_base()
 		{
 		ft::map<char,int> test;
 		PRT("size :" << test.size() << "|");
-		test.mini_insert('a',7);		PRT(" " << test.size() << "|");
-		test.mini_insert('c',21);		PRT(" " << test.size() << "|");
-		test.mini_insert('e',42);		PRT(" " << test.size() << "|");
-		test.mini_insert('b',13);		PRT(" " << test.size() << "|");
-		test.mini_insert('d',26);		PRINT(" " << test.size() << "|");
+		test['a'] = 7;		PRT(" " << test.size() << "|");
+		test['c'] = 21;		PRT(" " << test.size() << "|");
+		test['e'] = 42;		PRT(" " << test.size() << "|");
+		test['b'] = 13;		PRT(" " << test.size() << "|");
+		test['d'] = 26;		PRINT(" " << test.size() << "|");
 		ft::map<char,int>::iterator		it = test.begin();
 		ft::map<char,int>::iterator		ite = test.end();
 		int i = 0;
@@ -1791,11 +1791,11 @@ void		map_base()
 		ft::map<char,int> test;
 		ft::map<char,int>::iterator		it, ite;
 		PRT("size :" << test.size() << "|");
-		test.balance_mini_insert('a',7);		PRT(" " << test.size() << "|");
-		test.balance_mini_insert('c',21);		PRT(" " << test.size() << "|");
-		test.balance_mini_insert('e',42);		PRT(" " << test.size() << "|");
-		test.balance_mini_insert('b',13);		PRT(" " << test.size() << "|");
-		test.balance_mini_insert('d',26);		PRINT(" " << test.size() << "|");
+		test.insert(std::make_pair('a', 7));		PRT(" " << test.size() << "|");
+		test.insert(std::make_pair('c',21));		PRT(" " << test.size() << "|");
+		test.insert(std::make_pair('e',42));		PRT(" " << test.size() << "|");
+		test.insert(std::make_pair('b',13));		PRT(" " << test.size() << "|");
+		test.insert(std::make_pair('d',26));		PRINT(" " << test.size() << "|");
 		it = test.begin();
 		ite = test.end();
 		int i = 0;
@@ -1813,17 +1813,16 @@ void		map_base()
 		PRINT_YLW("\n----Balance test advance----\n");
 		ft::map<int, int> FT;
 		std::map<int, int> STD;
-		FT.balance_mini_insert(1, 0);
-		FT.balance_mini_insert(10, 0);
-		FT.balance_mini_insert(20, 0);
-		STD.insert(std::make_pair(0, 0));
+		FT.insert(std::make_pair(1, 0));
+		FT.insert(std::make_pair(10, 0));
+		FT.insert(std::make_pair(20, 0));
+		STD.insert(std::make_pair(1, 0));
 		STD.insert(std::make_pair(10, 0));
 		STD.insert(std::make_pair(20, 0));
 		for (int i = 1; i <= 5; i += 1)
 		{
-			// PRINT(-i << " " <<i+20);
-			FT.balance_mini_insert(-i, i);
-			FT.balance_mini_insert(i + 20, i);
+			FT.insert(std::make_pair(-i, i));
+			FT.insert(std::make_pair(i + 20, i));
 			STD.insert(std::make_pair(-i, i));
 			STD.insert(std::make_pair(i + 20, i));
 		}
@@ -1855,34 +1854,37 @@ void		map_base()
 		// ft::map<int,int>::iterator		it, ite;
 		FT.treeprint(); ENDL
 		PRINT_BLU("Erase 23" );	FT.erase(23);	FT.treeprint(); ENDL
-		PRINT_BLU("Erase 0" );		FT.erase(0);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 0" );	FT.erase(0);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase -3" );	FT.erase(-3);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase 20" );	FT.erase(20);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase -2" );	FT.erase(-2);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase 1" );	FT.erase(1);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase -1" );	FT.erase(-1);	FT.treeprint(); ENDL
-		PRINT_BLU("Erase 24" );	FT.erase(24);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase 22" );	FT.erase(22);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 24" );	FT.erase(24);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase -5" );	FT.erase(-5);	FT.treeprint(); ENDL
-		PRINT_BLU("Erase -4" );	FT.erase(-4);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase 21" );	FT.erase(21);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase 25" );	FT.erase(25);	FT.treeprint(); ENDL
+		PRINT_BLU("Erase -4" );	FT.erase(-4);	FT.treeprint(); ENDL
 		PRINT_BLU("Erase 10" );	FT.erase(10);	FT.treeprint(); ENDL
-		// PRINT_BLU("Erase 21" );	FT.erase(21);	FT.treeprint(); ENDL
 		}
-		// ft::map<char,int>::reverse_iterator		rit = test.rbegin();
-		// ft::map<char,int>::reverse_iterator		rite = test.rend();
-		// for(int i = 0; rit != rite; ++rit, ++i)
-		// 	PRINT(i << ": "<< rit->second << "|");
-
-		// PRINT("0 : '"<< it->first << "'/" << it->second << "|");// << test[0]);
-		// ++it;
-		// PRINT("1 : '"<< it->first << "'/" << it->second << "|");// << test[1]);
-		// ++it;
-		// PRINT("2 : '"<< it->first << "'/" << it->second << "|");// << test[2]);
-		// ++it;
-		// PRINT("3 : '"<< it->first << "'/" << it->second << "|");// << test[3]);
-		// ++it;
-		// PRINT("4 : '"<< it->first << "'/" << it->second << "|");// << test[4]);
+		{
+		PRINT_YLW("\n----REVERSE ITERATOR----\n")
+		ft::map<char,int>	mymap;
+		mymap['a']=10;
+		mymap['b']=20;
+		mymap['c']=30;
+		mymap['d']=40;
+		mymap['e']=50;
+		mymap['f']=60;
+		for(ft::map<char,int>::iterator it = mymap.begin(), ite = mymap.end(); it != ite; ++it)
+			PRINT(it->first << ": "<< it->second);
+		mymap.treeprint(); ENDL
+		ft::map<char,int>::reverse_iterator		rit = mymap.rbegin();
+		ft::map<char,int>::reverse_iterator		rite = mymap.rend();
+		for(; rit != rite; ++rit)
+			PRINT(rit->first << ": "<< rit->second);
+		}
 	}
 }
 
