@@ -364,17 +364,23 @@ public:
 
 	void merge (list& x)
 	{
-		if (this->end() == x.end())
-			return ;
-		for(iterator it = begin(); it != end(); it++)
+		if (&x == this)
+		return ;
+
+		iterator it = begin();
+		iterator it2 = x.begin();
+
+		while (it != end() && it2 != x.end())
 		{
-			if (*it > *x.begin())
-				splice(it, x);
-			for (; *it == *x.begin(); x.erase(x.begin()))
-				insert(it, *x.begin());
+			while (it2 != x.end() && *it > *it2)
+			{
+				insert(it, it2.getlist()->value);
+				it2++;
+			}
+			it++;
 		}
-		x.splice(x.begin(), *this);
-		*this = x;
+		if (it2 != x.end())
+		this->splice(end(), x, it2, x.end());
 		x.clear();
 	}
 

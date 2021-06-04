@@ -19,31 +19,19 @@ struct					s_map
 	struct s_map				*left;
 
 	s_map() {}
-	// s_map(T * value) : value(value) {}		// for -> node(&tmp_pair)
-	// s_map(const T * value) : value(value) {}
-	// s_map(T & value) : value(&value) {}		// for -> node(tmp_pair))
 	s_map(T & value) : value(value) {}
 	s_map(const T & value) : value(value) {}
-	~s_map() { }
-
-	// s_map&	operator=(const s_map & x) 
-	// {
-	// 	this->right = x.right;
-	// 	this->left = x.left;
-	// 	this->prev = x.prev;
-	// 	return *this;
-	// }
+	~s_map() {}
 };
 
 // --------------------------- class map ---------------------------
 template <	class Key,												// map::key_type
 			class T,												// map::mapped_type
 			class Compare = std::less<Key>,							// map::key_compare
-			class Alloc = std::allocator<std::pair<Key,T> >	// map::allocator_type // const
+			class Alloc = std::allocator<std::pair<Key,T> >			// map::allocator_type // const
 			>
 class map
 {
-	// template <class> friend class MapIterator;
 public:
 	typedef Key										key_type; // const
 	typedef T										mapped_type;
@@ -96,18 +84,9 @@ private:
 	{
 		_tail = _alloc_node.allocate(1);
 		_alloc_node.construct(_tail, node());
-		_tail->prev = NULL;
-		_tail->left = NULL;
-		_tail->right = NULL;
-	}
-
-	size_type		_check_len()
-	{
-		iterator	it = begin();
-		size_type	_len = 0;
-		for(; it != _tail; ++it)
-			++_len;
-		return _len;
+		_tail->prev = _tail;
+		_tail->left = _tail;
+		_tail->right = _tail;
 	}
 
 	node_ptr	_max_key()
@@ -180,56 +159,60 @@ private:
 		return tmp_node;
 	}
 
-	node_ptr	_add_node(const key_type & k, const mapped_type & m)
+	void		_add_node(const key_type & k, const mapped_type & m)
 	{
 		value_type		pair = value_type(k, m);
 		node_ptr		new_node = _create_node(pair);
 		node_ptr		tmp = _root;
 		node_ptr		tmp_prev;
+		iterator		it;
 
 		if(_len == 0)
-			_root_init(new_node);
-		else
+			return _root_init(new_node);
+		while(tmp != NULL && tmp != _tail
+				&& !_equality_check(new_node->value.first, tmp->value.first))
 		{
-			while(tmp && tmp != _tail && new_node->value.first != tmp->value.first)
-			{
-				tmp_prev = tmp;
-				if(_comp(new_node->value.first, tmp->value.first))
-					tmp = tmp->left;
-				else
-					tmp = tmp->right;
-			}
-			if(!tmp || tmp == _tail)
-			{
-				if(_comp(new_node->value.first, tmp_prev->value.first))
-					tmp_prev->left = new_node;
-				else
-					tmp_prev->right = new_node;
-				new_node->prev = tmp_prev;
-			}
+			tmp_prev = tmp;
+			if(_comp(new_node->value.first, tmp->value.first))
+				tmp = tmp->left;
+			else
+				tmp = tmp->right;
 		}
-		return new_node;
+		if(tmp == NULL || tmp == _tail)
+		{
+			if(_comp(new_node->value.first, tmp_prev->value.first))
+				tmp_prev->left = new_node;
+			else
+				tmp_prev->right = new_node;
+			new_node->prev = tmp_prev;
+		}
 	}
 
-	bool		_equality_check(const key_type & x, const key_type & y)
+	void		balance_mini_insert(key_type key, mapped_type val)
+	{
+		if(find(key) != end())
+			return ;
+		_add_node(key, val);
+		++_len;
+		_root = _balance_map(_root);
+		_tail_link();
+	}
+
+	bool		_equality_check(const key_type & x, const key_type & y) const
 	{
 		bool	left = _comp(x, y);
 		bool	right = _comp(y, x);
 		return left == right;
 	}
 
-	void		_root_erase(iterator position)
+	void		_erase_root()
 	{
-		position.get_map()->prev = NULL;
-		position.get_map()->left = NULL;
-		position.get_map()->right = NULL;
-		_alloc_node.destroy(position.get_map());
-		_alloc_node.deallocate(position.get_map(), 1);
-		--_len;
+		_alloc_node.destroy(_root);
+		_alloc_node.deallocate(_root, 1);
+		_len = 0;
 		_tail->prev = NULL;
 		_tail->left = NULL;
 		_tail->right = NULL;
-		_root = _tail;
 	}
 
 	//      ----BALANCE TREE----       // --- --- ---
@@ -324,16 +307,6 @@ private:
 		return _balance(tmp);
 	}
 
-	void		balance_mini_insert(key_type key, mapped_type val)
-	{
-		node_ptr	new_node;
-		new_node = _add_node(key, val);
-		// _check_len();
-		++_len;
-		_root = _balance_map(_root);
-		_tail_link();
-	}
-
 	//      ----PRINT TREE----       // --- --- ---
 	void		_printlv(int n) 
 	{
@@ -398,8 +371,11 @@ public:// --- --- --- PUBLIC:
 	// --- default
 	explicit map(const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-		: _alloc(alloc), _comp(comp), _root(NULL), _len(0)
 	{
+		_alloc = alloc;
+		_comp = comp;
+		_root = NULL;
+		_len = 0;
 		_empty_tail();
 	}
 
@@ -407,7 +383,15 @@ public:// --- --- --- PUBLIC:
 	template <class InputIterator>
 	map (InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type());
+			const allocator_type& alloc = allocator_type())
+	{
+		_alloc = alloc;
+		_comp = comp;
+		_root = NULL;
+		_len = 0;
+		_empty_tail();
+		insert(first, last);
+	}
 
 	// --- destructor
 	virtual ~map()
@@ -420,6 +404,9 @@ public:// --- --- --- PUBLIC:
 	// --- copy
 	map (const map & x)
 	{
+		_alloc = x._alloc;
+		_comp = x._comp;
+		_len = 0;
 		_empty_tail();
 		*this = x;
 	}
@@ -427,13 +414,7 @@ public:// --- --- --- PUBLIC:
 	map&		operator= (const map& x)
 	{
 		clear();
-		_alloc = x._alloc;
-		_comp = x._comp;
-		_root = x._root;
-		_tail = x._tail;
-		_alloc_node = x._alloc_node;
-		if(x._len != 0)
-			insert(x.begin(), x.end());
+		insert(x.begin(), x.end());
 		return *this;
 	}
 
@@ -441,10 +422,11 @@ public:// --- --- --- PUBLIC:
 	//single element (1)	
 	std::pair<iterator,bool>	insert(const value_type& val)
 	{
+		value_type					tmp_val = val;
 		std::pair<iterator,bool>	tmp;
 		size_type					tmp_len = _len;
 		balance_mini_insert(val.first, val.second);
-		iterator		tmp_it = find(val.first);
+		iterator		tmp_it = find(tmp_val.first);
 		if(tmp_len == _len)
 			tmp = std::pair<iterator,bool>(tmp_it,false);
 		else
@@ -453,39 +435,29 @@ public:// --- --- --- PUBLIC:
 	}
 
 	//with hint (2)	
-	iterator	insert(iterator position, const value_type& val);
+	iterator	insert(iterator position, const value_type& val)
+	{
+		insert(val);
+		position = find(val.first);
+		return position;
+	}
 
 	//range (3)	
 	template <class InputIterator>
-	void		insert (InputIterator first, InputIterator last);
-
-	void		_erase_root()
+	void		insert(InputIterator first, InputIterator last)
 	{
-		_alloc_node.destroy(_root);
-		_alloc_node.deallocate(_root, 1);
-		--_len;
-		_tail->prev = NULL;
-		_tail->left = NULL;
-		_tail->right = NULL;
-	// if(_tail)	PRT("!_tail  " << _tail->value.first);	if(_tail->prev)	PRT(" | prev " << _tail->prev->value.first);	if(_tail->left)	PRT(" | left " << _tail->left->value.first);	if(_tail->right)	PRT(" | right " << _tail->right->value.first); ENDL
+		for(; first != last; ++first)
+			insert(first.get_map()->value);
 	}
 
 	void		erase(iterator position)
 	{
-		// PRINT("!_len " << _len);
-		if(position == _tail)
+		if(!position.get_map() || position == _tail )
 			return ;
-		if(position == _root && _len == 1)
-			return _erase_root();
 		iterator	node = position;
 		iterator	tmp;
 		if(node.get_map()->right != NULL && node.get_map()->right != _tail)
 			++node;
-
-	// if(position.get_map())	PRT("! pos  " << position.get_map()->value.first);	if(position.get_map()->prev)	PRT(" | prev " << position.get_map()->prev->value.first);	if(position.get_map()->left)	PRT(" | left " << position.get_map()->left->value.first);	if(position.get_map()->right)	PRT(" | right " << position.get_map()->right->value.first); ENDL
-	// if(node.get_map())		PRT("! node " << node.get_map()->value.first);		if(node.get_map()->prev)		PRT(" | prev " << node.get_map()->prev->value.first);		if(node.get_map()->left)		PRT(" | left " << node.get_map()->left->value.first);		if(node.get_map()->right)		PRT(" | right " << node.get_map()->right->value.first); ENDL
-	// if(_tail)	PRT("!_tail  " << _tail->value.first);	if(_tail->prev)	PRT(" | prev " << _tail->prev->value.first);	if(_tail->left)	PRT(" | left " << _tail->left->value.first);	if(_tail->right)	PRT(" | right " << _tail->right->value.first); ENDL
-
 		if(position == node && !node.get_map()->left && (!node.get_map()->right || node.get_map()->right == _tail))
 		{
 			tmp = node.get_map()->prev;
@@ -493,8 +465,6 @@ public:// --- --- --- PUBLIC:
 				tmp.get_map()->left = NULL;
 			else
 				tmp.get_map()->right = NULL;
-			// tmp.get_map()->left = node.get_map()->left;
-
 		}
 		else
 		{
@@ -510,11 +480,6 @@ public:// --- --- --- PUBLIC:
 			else if(position.get_map()->left != node.get_map())
 				node.get_map()->prev->right = NULL;
 		}
-
-	// if(position.get_map())	PRT("- pos  " << position.get_map()->value.first);	if(position.get_map()->prev)	PRT(" | prev " << position.get_map()->prev->value.first);	if(position.get_map()->left)	PRT(" | left " << position.get_map()->left->value.first);	if(position.get_map()->right)	PRT(" | right " << position.get_map()->right->value.first); ENDL
-	// if(node.get_map())		PRT("- node " << node.get_map()->value.first);		if(node.get_map()->prev)		PRT(" | prev " << node.get_map()->prev->value.first);		if(node.get_map()->left)		PRT(" | left " << node.get_map()->left->value.first);		if(node.get_map()->right)		PRT(" | right " << node.get_map()->right->value.first); ENDL
-	// if(_tail)	PRT("-_tail  " << _tail->value.first);	if(_tail->prev)	PRT(" | prev " << _tail->prev->value.first);	if(_tail->left)	PRT(" | left " << _tail->left->value.first);	if(_tail->right)	PRT(" | right " << _tail->right->value.first); ENDL
-
 		_alloc_node.destroy(node.get_map());
 		_alloc_node.deallocate(node.get_map(), 1);
 		--_len;
@@ -545,9 +510,11 @@ public:// --- --- --- PUBLIC:
 	{
 		if(_len == 0)
 			return ;
-		iterator	it = begin(), ite = end();
-		for(; it != ite; ++it)
+		iterator	it = begin();
+		for(; it != end(); ++it)
 			erase(it);
+		if(_len == 1)
+			_erase_root();
 	}
 
 // --------------------------- Operations ---------------------------
@@ -568,12 +535,27 @@ public:// --- --- --- PUBLIC:
 		}
 		return iterator(node);
 	}
-	const_iterator find(const key_type& k) const { return find(k); }
+	const_iterator find(const key_type& k) const
+	{
+		if(_len == 0)
+			return end();
+		node_ptr	node = _root;
+		while(_equality_check(node->value.first, k) != true)
+		{
+			if(_comp(node->value.first, k) == true)
+				node = node->right;
+			else
+				node = node->left;
+			if(node == NULL || node == _tail)
+				return end();
+		}
+		return iterator(node);
+	}
 
 	size_type	count(const key_type& k) const
 	{
 		iterator src = find(k);
-		if(src.getMap() == _tail)
+		if(src.get_map() == _tail)
 			return(0);
 		else
 			return (1);
@@ -582,26 +564,38 @@ public:// --- --- --- PUBLIC:
 	iterator	lower_bound(const key_type& k)
 	{
 		iterator src = find(k);
-		if(src.getMap() == _tail)
+		if(src.get_map() == _tail)
 		{
 			src = begin();
-			while(src.getMap()->key_value.first < k)
+			while(src.get_map()->value.first < k)
 				src++;
 			return(src);
 		}
 		else
 			return (src);
 	}
+
 	const_iterator lower_bound(const key_type& k) const
-	{ return lower_bound(k); }
+	{
+		iterator src = find(k);
+		if(src.get_map() == _tail)
+		{
+			src = begin();
+			while(src.get_map()->value.first < k)
+				src++;
+			return(src);
+		}
+		else
+			return (src);
+	}
 
 	iterator	upper_bound(const key_type& k)
 	{
 		iterator src = find(k);
-		if(src.getMap() == _tail)
+		if(src.get_map() == _tail)
 		{
 			src = begin();
-			while(src.getMap()->key_value.first < k)
+			while(src.get_map()->value.first < k)
 				src++;
 			return(src);
 		}
@@ -612,7 +606,21 @@ public:// --- --- --- PUBLIC:
 		}
 	}
 	const_iterator upper_bound(const key_type& k) const
-	{ return upper_bound(k); }
+	{
+		iterator src = find(k);
+		if(src.get_map() == _tail)
+		{
+			src = begin();
+			while(src.get_map()->value.first < k)
+				src++;
+			return(src);
+		}
+		else
+		{
+			src++;
+			return (src);
+		}
+	}
 
 	std::pair<const_iterator, const_iterator>	equal_range(const key_type& k) const
 	{
@@ -621,7 +629,11 @@ public:// --- --- --- PUBLIC:
 		return(std::pair<const_iterator, const_iterator>(first, second));
 	}
 	std::pair<iterator, iterator>				equal_range(const key_type& k)
-	{ return equal_range(k); }
+	{
+		const_iterator first = lower_bound(k);
+		const_iterator second = upper_bound(k);
+		return(std::pair<const_iterator, const_iterator>(first, second));
+	}
 
 // --------------------------- Element access ---------------------------
 	mapped_type&	operator[] (const key_type& k)
@@ -641,8 +653,7 @@ public:// --- --- --- PUBLIC:
 	size_type		size() const		{ return _len;			}
 	bool			empty() const		{ return _len == 0;		}
 	size_type		max_size() const	{ return
-		// std::numeric_limits<size_type>::max() / sizeof(ft::map<Key,T>);	}
-		_alloc.max_size(); }
+		_alloc_node.max_size(); 								}
 
 // --------------------------- Iterators ---------------------------
 	iterator begin()						{ return iterator(_tail->right);			}

@@ -111,8 +111,8 @@ public:
 
 public:
 	ConstMapIterator() : MapIterator<T, Compare >()										{}
-	// // ConstMapIterator(ft::s_map<T> * x) : MapIterator<T>(x)					{}
-	// ConstMapIterator(ConstMapIterator& copy) : MapIterator<T, Compare >(copy)	{}
+	ConstMapIterator(ft::s_map<T> * x) : MapIterator<T, Compare >(x)					{}
+	ConstMapIterator(ConstMapIterator& copy) : MapIterator<T, Compare >(copy)			{}
 	ConstMapIterator(MapIterator<T, Compare > x) : MapIterator<T, Compare >(x)					{}
 
 	ConstMapIterator&	operator=(const ConstMapIterator& x) { this->_p = x._p; return *this;	}
@@ -127,7 +127,7 @@ public:
 	typedef T 							value_type;
 	typedef ft::s_map<value_type>		node;
 public:
-	// ReverseMapIterator() : MapIterator<T, Compare >()										{}
+	ReverseMapIterator() : MapIterator<T, Compare >()										{}
 	ReverseMapIterator(ft::s_map<T> * x) : MapIterator<T, Compare >(x)						{}
 	ReverseMapIterator(const ReverseMapIterator& copy) : MapIterator<T, Compare >(copy)		{}
 
@@ -186,9 +186,9 @@ public:
 	typedef ft::s_map<value_type>		node;
 
 public:
-	// ConstReverseMapIterator() : ReverseMapIterator<T>()											{}
-	// ConstReverseMapIterator(ft::s_map<T> * x) : ReverseMapIterator<T>(x)							{}
-	// ConstReverseMapIterator(const ConstReverseMapIterator& copy) : ReverseMapIterator<T>(copy)	{}
+	ConstReverseMapIterator() : ReverseMapIterator<T, Compare >()											{}
+	ConstReverseMapIterator(ft::s_map<T> * x) : ReverseMapIterator<T, Compare >(x)							{}
+	ConstReverseMapIterator(const ConstReverseMapIterator& copy) : ReverseMapIterator<T, Compare >(copy)	{}
 	ConstReverseMapIterator(ReverseMapIterator<T, Compare > x) : ReverseMapIterator<T, Compare >(x)					{}
 
 	ConstReverseMapIterator&	operator=(const ConstReverseMapIterator& x)	{ this->_p = x._p; return *this;	}
